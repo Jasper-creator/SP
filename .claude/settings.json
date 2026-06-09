@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"const m = require\\('@react-native/metro-config'\\); console.log\\(Object.keys\\(m\\)\\)\")",
+      "Bash(npm ls *)",
+      "Bash(xargs ls)"
+    ]
+  }
+}
