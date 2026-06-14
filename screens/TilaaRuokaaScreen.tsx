@@ -5,9 +5,10 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  SafeAreaView,
+
   Modal,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface FoodType {
   id: string;
@@ -378,7 +379,7 @@ export default function TilaaRuokaaScreen({ onBack }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFF5F7' },
+  container: { flex: 1, backgroundColor: 'transparent' },
   header: { paddingHorizontal: 24, paddingTop: 16, paddingBottom: 16 },
   backBtn: { marginBottom: 12 },
   backText: { color: '#FF6B9D', fontSize: 16, fontWeight: '600' },

@@ -1,0 +1,88 @@
+{
+  "fill" : {
+    "linear-gradient" : [
+      "display-p3:1.00000,0.80486,1.00000,1.00000",
+      "srgb:1.00000,0.42257,1.00000,1.00000"
+    ],
+    "orientation" : {
+      "start" : {
+        "x" : 0.5,
+        "y" : 0
+      },
+      "stop" : {
+        "x" : 0.5,
+        "y" : 0.7
+      }
+    }
+  },
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "glass" : false,
+          "hidden" : false,
+          "image-name" : "Tie 2.svg",
+          "name" : "Tie 2",
+          "position" : {
+            "scale" : 2,
+            "translation-in-points" : [
+              216.6875,
+              76.265625
+            ]
+          }
+        },
+        {
+          "glass" : false,
+          "image-name" : "Womens Bow Tie.png",
+          "name" : "Womens Bow Tie",
+          "position" : {
+            "scale" : 2,
+            "translation-in-points" : [
+              -110.796875,
+              -235.6640625
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "layers" : [
+        {
+          "fill" : "automatic",
+          "hidden" : false,
+          "image-name" : "Group 5.svg",
+          "name" : "Group 5",
+          "position" : {
+            "scale" : 2.25,
+            "translation-in-points" : [
+              3.3237273214581364e-05,
+              -0.08502520863862628
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}

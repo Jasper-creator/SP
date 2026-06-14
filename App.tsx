@@ -1,16 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import { StatusBar, View, Text, StyleSheet, Animated, TouchableOpacity } from 'react-native';
+import {
+  Animated,
+  ImageBackground,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { UserProvider, useUser } from './src/context/UserContext';
-import { initFCM, onForegroundMessage, registerBackgroundHandler } from './src/firebase/fcm';
-import { seedDefaultRecipes } from './src/firebase/db';
-import LoginScreen from './screens/LoginScreen';
 import HomeScreen from './screens/HomeScreen';
-import TreffitScreen from './screens/TreffitScreen';
-import TehdaanRuokaaScreen from './screens/TehdaanRuokaaScreen';
 import KauppalistaScreen from './screens/KauppalistaScreen';
-import TilaaRuokaaScreen from './screens/TilaaRuokaaScreen';
+import KohdelistaScreen from './screens/KohdelistaScreen';
+import LeffalistaScreen from './screens/LeffalistaScreen';
+import LoginScreen from './screens/LoginScreen';
 import NotificationsScreen from './screens/NotificationsScreen';
+import TehdaanRuokaaScreen from './screens/TehdaanRuokaaScreen';
+import TilaaRuokaaScreen from './screens/TilaaRuokaaScreen';
+import TreffitScreen from './screens/TreffitScreen';
+import { UserProvider, useUser } from './src/context/UserContext';
+import { seedDefaultRecipes } from './src/firebase/db';
+import {
+  initFCM,
+  onForegroundMessage,
+  registerBackgroundHandler,
+} from './src/firebase/fcm';
 
 export type Screen =
   | 'home'
@@ -18,7 +32,9 @@ export type Screen =
   | 'ruoka'
   | 'kauppalista'
   | 'tilaa'
-  | 'notifications';
+  | 'notifications'
+  | 'leffalista'
+  | 'kohdelista';
 
 // Register background handler at module level (required by Firebase)
 registerBackgroundHandler();
@@ -44,9 +60,17 @@ function AppContent() {
     return onForegroundMessage((title, body) => {
       setBanner({ title, body });
       Animated.sequence([
-        Animated.timing(bannerOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
+        Animated.timing(bannerOpacity, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
         Animated.delay(3500),
-        Animated.timing(bannerOpacity, { toValue: 0, duration: 300, useNativeDriver: true }),
+        Animated.timing(bannerOpacity, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
       ]).start(() => setBanner(null));
     });
   }, [userId]);
@@ -71,6 +95,8 @@ function AppContent() {
       {screen === 'kauppalista' && <KauppalistaScreen onBack={goBack} />}
       {screen === 'tilaa' && <TilaaRuokaaScreen onBack={goBack} />}
       {screen === 'notifications' && <NotificationsScreen onBack={goBack} />}
+      {screen === 'leffalista' && <LeffalistaScreen onBack={goBack} />}
+      {screen === 'kohdelista' && <KohdelistaScreen onBack={goBack} />}
 
       {banner && (
         <Animated.View style={[styles.banner, { opacity: bannerOpacity }]}>
@@ -91,15 +117,25 @@ export default function App() {
   return (
     <UserProvider>
       <SafeAreaProvider>
-        <StatusBar barStyle="dark-content" backgroundColor="#FFF5F7" />
-        <AppContent />
+        <ImageBackground
+          source={require('./Images/Background.webp')}
+          style={{ flex: 1 }}
+          resizeMode="cover"
+        >
+          <StatusBar barStyle="dark-content" />
+          <AppContent />
+        </ImageBackground>
       </SafeAreaProvider>
     </UserProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  splash: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFF5F7' },
+  splash: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   splashHeart: { fontSize: 72 },
   banner: {
     position: 'absolute',
@@ -118,7 +154,12 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   bannerContent: { flex: 1 },
-  bannerTitle: { color: '#fff', fontSize: 14, fontWeight: '700', marginBottom: 2 },
+  bannerTitle: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '700',
+    marginBottom: 2,
+  },
   bannerBody: { color: 'rgba(255,255,255,0.8)', fontSize: 13 },
   bannerClose: { color: '#888', fontSize: 16, padding: 4 },
 });

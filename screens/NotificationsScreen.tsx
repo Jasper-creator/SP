@@ -5,8 +5,9 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  SafeAreaView,
+
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUser } from '../src/context/UserContext';
 import {
   watchNotifications,
@@ -103,7 +104,7 @@ export default function NotificationsScreen({ onBack }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFF5F7' },
+  container: { flex: 1, backgroundColor: 'transparent' },
   header: { paddingHorizontal: 24, paddingTop: 16, paddingBottom: 12 },
   backBtn: { marginBottom: 12 },
   backText: { color: '#FF6B9D', fontSize: 16, fontWeight: '600' },

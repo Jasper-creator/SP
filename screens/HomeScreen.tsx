@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import {
-  View,
+  Image,
+  ScrollView,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  SafeAreaView,
+  View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Screen } from '../App';
 import { useUser } from '../src/context/UserContext';
 import { watchNotifications } from '../src/firebase/db';
@@ -20,15 +21,15 @@ const categories = [
   {
     id: 'treffit',
     label: 'Treffit',
-    emoji: '💑',
+    image: require('../Images/treffi.webp'),
     color: '#FF6B9D',
     bg: '#FFE4EE',
-    description: 'Ideoita yhteiseen aikaan',
+    description: 'Suunnittele yhteinen ilta',
   },
   {
     id: 'ruoka',
     label: 'Tehdään Ruokaa',
-    emoji: '👨‍🍳',
+    image: require('../Images/kokki.webp'),
     color: '#FF8C69',
     bg: '#FFE8D6',
     description: 'Reseptit ja valmistusohjeet',
@@ -36,7 +37,7 @@ const categories = [
   {
     id: 'kauppalista',
     label: 'Kauppalista',
-    emoji: '🛒',
+    image: require('../Images/kauppa.webp'),
     color: '#5BB8D4',
     bg: '#D6EFF8',
     description: 'Ostokset helposti listaan',
@@ -44,10 +45,26 @@ const categories = [
   {
     id: 'tilaa',
     label: 'Tilaa Ruokaa',
-    emoji: '🍜',
+    image: require('../Images/Tilaus.webp'),
     color: '#4BAF9E',
     bg: '#D4F0EA',
     description: 'Löydä paikalliset ravintolat',
+  },
+  {
+    id: 'leffalista',
+    label: 'Leffalista',
+    image: require('../Images/elokuva.webp'),
+    color: '#7B61FF',
+    bg: '#EDE8FF',
+    description: 'Leffavinkit odottamassa',
+  },
+  {
+    id: 'kohdelista',
+    label: 'Kohdelista',
+    image: require('../Images/Kartta.webp'),
+    color: '#E8820C',
+    bg: '#FFF0DE',
+    description: 'Paikat joissa halutaan käydä',
   },
 ];
 
@@ -82,7 +99,9 @@ export default function HomeScreen({ onNavigate }: Props) {
               <Text style={styles.notifIcon}>🔔</Text>
               {unreadCount > 0 && (
                 <View style={styles.badge}>
-                  <Text style={styles.badgeText}>{unreadCount > 9 ? '9+' : unreadCount}</Text>
+                  <Text style={styles.badgeText}>
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </Text>
                 </View>
               )}
             </TouchableOpacity>
@@ -93,7 +112,10 @@ export default function HomeScreen({ onNavigate }: Props) {
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={styles.grid} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.grid}
+        showsVerticalScrollIndicator={false}
+      >
         {categories.map(cat => (
           <TouchableOpacity
             key={cat.id}
@@ -102,10 +124,12 @@ export default function HomeScreen({ onNavigate }: Props) {
             activeOpacity={0.82}
           >
             <View style={[styles.iconCircle, { backgroundColor: cat.color }]}>
-              <Text style={styles.emoji}>{cat.emoji}</Text>
+              <Image source={cat.image} style={styles.categoryImage} resizeMode="contain" />
             </View>
             <View style={styles.cardText}>
-              <Text style={[styles.cardTitle, { color: cat.color }]}>{cat.label}</Text>
+              <Text style={[styles.cardTitle, { color: cat.color }]}>
+                {cat.label}
+              </Text>
               <Text style={styles.cardDesc}>{cat.description}</Text>
             </View>
             <Text style={[styles.arrow, { color: cat.color }]}>›</Text>
@@ -117,12 +141,21 @@ export default function HomeScreen({ onNavigate }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFF5F7' },
+  container: { flex: 1, backgroundColor: 'transparent' },
   header: { paddingHorizontal: 24, paddingTop: 28, paddingBottom: 20 },
-  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
   greeting: { fontSize: 30, fontWeight: '800', color: '#222', marginBottom: 4 },
   subtitle: { fontSize: 16, color: '#999', fontWeight: '500' },
-  headerActions: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 4 },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginTop: 4,
+  },
   notifBtn: { position: 'relative', padding: 6 },
   notifIcon: { fontSize: 26 },
   badge: {
@@ -165,7 +198,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 16,
   },
-  emoji: { fontSize: 30 },
+  categoryImage: { width: 36, height: 36 },
   cardText: { flex: 1 },
   cardTitle: { fontSize: 19, fontWeight: '700', marginBottom: 3 },
   cardDesc: { fontSize: 13, color: '#888' },

@@ -1,11 +1,5 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
-} from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { UserId } from '../src/types';
 
 interface Props {
@@ -16,28 +10,39 @@ export default function LoginScreen({ onSelect }: Props) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.heart}>💕</Text>
+        <Image
+          source={require('../Images/Two_WholeBodies.webp')}
+          style={styles.heroImage}
+          resizeMode="contain"
+        />
         <Text style={styles.title}>Tervetuloa!</Text>
         <Text style={styles.subtitle}>Kuka sinä olet?</Text>
-
-        <TouchableOpacity
-          style={[styles.userBtn, styles.jasperBtn]}
-          onPress={() => onSelect('jasper')}
-          activeOpacity={0.85}
-        >
-          <Text style={styles.userEmoji}>👦</Text>
-          <Text style={styles.userName}>Jasper</Text>
-          <Text style={styles.userHint}>Se romanttisempi</Text>
-        </TouchableOpacity>
 
         <TouchableOpacity
           style={[styles.userBtn, styles.senjaBtn]}
           onPress={() => onSelect('senja')}
           activeOpacity={0.85}
         >
-          <Text style={styles.userEmoji}>👧</Text>
+          <Image
+            source={require('../Images/Girl.webp')}
+            style={styles.userImage}
+            resizeMode="contain"
+          />
           <Text style={styles.userName}>Senja</Text>
           <Text style={styles.userHint}>Jasperille tehty sovellus</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.userBtn, styles.jasperBtn]}
+          onPress={() => onSelect('jasper')}
+          activeOpacity={0.85}
+        >
+          <Image
+            source={require('../Images/Boy.webp')}
+            style={styles.userImage}
+            resizeMode="contain"
+          />
+          <Text style={styles.userName}>Jasper</Text>
+          <Text style={styles.userHint}>Se romanttisempi</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -45,16 +50,22 @@ export default function LoginScreen({ onSelect }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFF5F7' },
+  container: { flex: 1, backgroundColor: 'transparent' },
   content: {
     flex: 1,
-    justifyContent: 'center',
+
     alignItems: 'center',
     padding: 32,
     gap: 16,
   },
-  heart: { fontSize: 72, marginBottom: 8 },
-  title: { fontSize: 34, fontWeight: '800', color: '#222' },
+  heroImage: {
+    width: 300,
+    height: 300,
+    marginBottom: 8,
+    position: 'absolute',
+    top: -90,
+  },
+  title: { fontSize: 34, fontWeight: '800', color: '#222', marginTop: 150 },
   subtitle: { fontSize: 18, color: '#AAA', marginBottom: 16 },
   userBtn: {
     width: '100%',
@@ -70,7 +81,13 @@ const styles = StyleSheet.create({
   },
   jasperBtn: { backgroundColor: '#D6EFF8' },
   senjaBtn: { backgroundColor: '#FFE4EE' },
-  userEmoji: { fontSize: 52 },
+  userImage: {
+    width: 150,
+    height: 150,
+    position: 'absolute',
+    left: -25,
+    top: -25,
+  },
   userName: { fontSize: 26, fontWeight: '800', color: '#222' },
   userHint: { fontSize: 13, color: '#AAA' },
 });

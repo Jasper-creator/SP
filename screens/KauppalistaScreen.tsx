@@ -5,13 +5,14 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  SafeAreaView,
+  Image,
   TextInput,
   Modal,
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUser } from '../src/context/UserContext';
 import {
   watchShoppingList,
@@ -165,9 +166,14 @@ export default function KauppalistaScreen({ onBack }: Props) {
                     </Text>
                     <View style={styles.itemMeta}>
                       <Text style={styles.itemAmount}>{item.amount} {item.unit}</Text>
-                      <Text style={styles.itemBy}>
-                        {item.addedBy === 'jasper' ? '👦' : '👧'} {item.addedBy === 'jasper' ? 'Jasper' : 'Senja'}
-                      </Text>
+                      <View style={styles.itemByRow}>
+                        <Image
+                          source={item.addedBy === 'jasper' ? require('../Images/Boy.webp') : require('../Images/Girl.webp')}
+                          style={styles.itemByImage}
+                          resizeMode="contain"
+                        />
+                        <Text style={styles.itemBy}>{item.addedBy === 'jasper' ? 'Jasper' : 'Senja'}</Text>
+                      </View>
                     </View>
                   </View>
                   <TouchableOpacity onPress={() => remove(item.id)} style={styles.removeBtn}>
@@ -261,7 +267,7 @@ export default function KauppalistaScreen({ onBack }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFF5F7' },
+  container: { flex: 1, backgroundColor: 'transparent' },
   loadingCenter: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   header: { paddingHorizontal: 24, paddingTop: 16, paddingBottom: 12 },
   backBtn: { marginBottom: 12 },
@@ -297,6 +303,8 @@ const styles = StyleSheet.create({
   itemNameDone: { textDecorationLine: 'line-through', color: '#AAA' },
   itemMeta: { flexDirection: 'row', gap: 10, marginTop: 2 },
   itemAmount: { fontSize: 13, color: '#5BB8D4', fontWeight: '700' },
+  itemByRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  itemByImage: { width: 16, height: 16 },
   itemBy: { fontSize: 12, color: '#CCC' },
   removeBtn: { padding: 6 },
   removeText: { fontSize: 15, color: '#DDD', fontWeight: '700' },

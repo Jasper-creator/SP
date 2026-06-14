@@ -1,56 +1,71 @@
-import database from '@react-native-firebase/database';
+import {
+  getDatabase,
+  ref,
+  onValue,
+  push,
+  update,
+  remove,
+  get,
+  query,
+  orderByChild,
+  equalTo,
+} from '@react-native-firebase/database';
 import {
   ShoppingItem,
   Recipe,
   TreffitProposal,
   AppNotification,
+  ListItem,
   UserId,
 } from '../types';
+
+const db = () => getDatabase();
 
 // ─── Shopping list ────────────────────────────────────────────────────────────
 
 export function watchShoppingList(
   onUpdate: (items: ShoppingItem[]) => void,
 ): () => void {
-  const ref = database().ref('/shared/kauppalista');
-  const cb = (snapshot: any) => {
+  const r = ref(db(), '/shared/kauppalista');
+  return onValue(r, snapshot => {
     const val = snapshot.val();
     const items: ShoppingItem[] = val
       ? Object.entries(val).map(([id, d]) => ({ id, ...(d as any) }))
       : [];
     items.sort((a, b) => (a.addedAt || 0) - (b.addedAt || 0));
     onUpdate(items);
-  };
-  ref.on('value', cb);
-  return () => ref.off('value', cb);
+  }, (error: Error) => {
+    console.error('[watchShoppingList] Firebase error:', error.message);
+    onUpdate([]);
+  });
 }
 
 export async function addShoppingItem(
   item: Omit<ShoppingItem, 'id'>,
 ): Promise<void> {
-  await database().ref('/shared/kauppalista').push(item);
+  await push(ref(db(), '/shared/kauppalista'), item);
 }
 
 export async function toggleShoppingItem(
   id: string,
   done: boolean,
 ): Promise<void> {
-  await database().ref(`/shared/kauppalista/${id}`).update({ done });
+  await update(ref(db(), `/shared/kauppalista/${id}`), { done });
 }
 
 export async function deleteShoppingItem(id: string): Promise<void> {
-  await database().ref(`/shared/kauppalista/${id}`).remove();
+  await remove(ref(db(), `/shared/kauppalista/${id}`));
 }
 
 export async function clearDoneItems(): Promise<void> {
-  const snapshot = await database().ref('/shared/kauppalista').once('value');
+  const snapshot = await get(ref(db(), '/shared/kauppalista'));
   const val = snapshot.val();
   if (!val) return;
   const updates: Record<string, null> = {};
   Object.entries(val).forEach(([id, item]) => {
-    if ((item as any).done) updates[id] = null;
+    if ((item as any).done) updates[`/shared/kauppalista/${id}`] = null;
   });
-  await database().ref('/shared/kauppalista').update(updates);
+  await update(ref(db(), '/'), updates);
 }
 
 // ─── Recipes ──────────────────────────────────────────────────────────────────
@@ -58,8 +73,8 @@ export async function clearDoneItems(): Promise<void> {
 export function watchRecipes(
   onUpdate: (recipes: Recipe[]) => void,
 ): () => void {
-  const ref = database().ref('/shared/reseptit');
-  const cb = (snapshot: any) => {
+  const r = ref(db(), '/shared/reseptit');
+  return onValue(r, snapshot => {
     const val = snapshot.val();
     const recipes: Recipe[] = val
       ? Object.entries(val).map(([id, d]) => {
@@ -75,9 +90,7 @@ export function watchRecipes(
       : [];
     recipes.sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
     onUpdate(recipes);
-  };
-  ref.on('value', cb);
-  return () => ref.off('value', cb);
+  });
 }
 
 export async function addRecipe(recipe: Omit<Recipe, 'id'>): Promise<void> {
@@ -86,15 +99,15 @@ export async function addRecipe(recipe: Omit<Recipe, 'id'>): Promise<void> {
     (acc, ing, i) => ({ ...acc, [i]: ing }),
     {},
   );
-  await database().ref('/shared/reseptit').push({ ...rest, ingredients: ingredientsObj });
+  await push(ref(db(), '/shared/reseptit'), { ...rest, ingredients: ingredientsObj });
 }
 
 export async function deleteRecipe(id: string): Promise<void> {
-  await database().ref(`/shared/reseptit/${id}`).remove();
+  await remove(ref(db(), `/shared/reseptit/${id}`));
 }
 
 export async function seedDefaultRecipes(): Promise<void> {
-  const snapshot = await database().ref('/shared/reseptit').once('value');
+  const snapshot = await get(ref(db(), '/shared/reseptit'));
   if (snapshot.exists()) return;
 
   const defaults: Omit<Recipe, 'id'>[] = [
@@ -157,11 +170,11 @@ export async function seedDefaultRecipes(): Promise<void> {
       (acc, ing, i) => ({ ...acc, [i]: ing }),
       {},
     );
-    const key = database().ref('/shared/reseptit').push().key!;
-    batch[key] = { ...rest, ingredients: ingredientsObj };
+    const key = push(ref(db(), '/shared/reseptit')).key!;
+    batch[`/shared/reseptit/${key}`] = { ...rest, ingredients: ingredientsObj };
   });
 
-  await database().ref('/shared/reseptit').update(batch);
+  await update(ref(db(), '/'), batch);
 }
 
 // ─── Treffit proposals ────────────────────────────────────────────────────────
@@ -169,30 +182,28 @@ export async function seedDefaultRecipes(): Promise<void> {
 export function watchTreffitProposals(
   onUpdate: (proposals: TreffitProposal[]) => void,
 ): () => void {
-  const ref = database().ref('/shared/treffit');
-  const cb = (snapshot: any) => {
+  const r = ref(db(), '/shared/treffit');
+  return onValue(r, snapshot => {
     const val = snapshot.val();
     const proposals: TreffitProposal[] = val
       ? Object.entries(val).map(([id, d]) => ({ id, ...(d as any) }))
       : [];
     proposals.sort((a, b) => (b.proposedAt || 0) - (a.proposedAt || 0));
     onUpdate(proposals);
-  };
-  ref.on('value', cb);
-  return () => ref.off('value', cb);
+  });
 }
 
 export async function proposeTreffit(
   proposal: Omit<TreffitProposal, 'id'>,
 ): Promise<void> {
-  await database().ref('/shared/treffit').push(proposal);
+  await push(ref(db(), '/shared/treffit'), proposal);
 }
 
 export async function updateTreffitStatus(
   id: string,
   status: 'confirmed' | 'declined',
 ): Promise<void> {
-  await database().ref(`/shared/treffit/${id}`).update({ status });
+  await update(ref(db(), `/shared/treffit/${id}`), { status });
 }
 
 // ─── Notifications ────────────────────────────────────────────────────────────
@@ -201,34 +212,86 @@ export function watchNotifications(
   userId: UserId,
   onUpdate: (notifications: AppNotification[]) => void,
 ): () => void {
-  const ref = database().ref('/notifications').orderByChild('to').equalTo(userId);
-  const cb = (snapshot: any) => {
+  const r = query(ref(db(), '/notifications'), orderByChild('to'), equalTo(userId));
+  return onValue(r, snapshot => {
     const val = snapshot.val();
     const notifications: AppNotification[] = val
       ? Object.entries(val).map(([id, d]) => ({ id, ...(d as any) }))
       : [];
     notifications.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
     onUpdate(notifications);
-  };
-  ref.on('value', cb);
-  return () => ref.off('value', cb);
+  });
 }
 
 export async function sendNotification(
   notif: Omit<AppNotification, 'id'>,
 ): Promise<void> {
-  await database().ref('/notifications').push(notif);
+  await push(ref(db(), '/notifications'), notif);
 }
 
 export async function markNotificationRead(
   id: string,
   userId: UserId,
 ): Promise<void> {
-  await database().ref(`/notifications/${id}/read/${userId}`).set(true);
+  await update(ref(db(), `/notifications/${id}/read/${userId}`), { [userId]: true });
 }
 
 // ─── FCM tokens ───────────────────────────────────────────────────────────────
 
 export async function saveFcmToken(userId: UserId, token: string): Promise<void> {
-  await database().ref(`/users/${userId}`).update({ fcmToken: token, lastSeen: Date.now() });
+  await update(ref(db(), `/users/${userId}`), { fcmToken: token, lastSeen: Date.now() });
+}
+
+// ─── Leffalista ────────────────────────────────────────────────────────────────
+
+export function watchLeffalista(
+  onUpdate: (items: ListItem[]) => void,
+): () => void {
+  const r = ref(db(), '/shared/leffalista');
+  return onValue(r, snapshot => {
+    const val = snapshot.val();
+    const items: ListItem[] = val
+      ? Object.entries(val).map(([id, d]) => ({ id, ...(d as any) }))
+      : [];
+    items.sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
+    onUpdate(items);
+  }, (error: Error) => {
+    console.error('[watchLeffalista] Firebase error:', error.message);
+    onUpdate([]);
+  });
+}
+
+export async function addLeffaItem(item: Omit<ListItem, 'id'>): Promise<void> {
+  await push(ref(db(), '/shared/leffalista'), item);
+}
+
+export async function deleteLeffaItem(id: string): Promise<void> {
+  await remove(ref(db(), `/shared/leffalista/${id}`));
+}
+
+// ─── Kohdelista ────────────────────────────────────────────────────────────────
+
+export function watchKohdelista(
+  onUpdate: (items: ListItem[]) => void,
+): () => void {
+  const r = ref(db(), '/shared/kohdelista');
+  return onValue(r, snapshot => {
+    const val = snapshot.val();
+    const items: ListItem[] = val
+      ? Object.entries(val).map(([id, d]) => ({ id, ...(d as any) }))
+      : [];
+    items.sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
+    onUpdate(items);
+  }, (error: Error) => {
+    console.error('[watchKohdelista] Firebase error:', error.message);
+    onUpdate([]);
+  });
+}
+
+export async function addKohdeItem(item: Omit<ListItem, 'id'>): Promise<void> {
+  await push(ref(db(), '/shared/kohdelista'), item);
+}
+
+export async function deleteKohdeItem(id: string): Promise<void> {
+  await remove(ref(db(), `/shared/kohdelista/${id}`));
 }

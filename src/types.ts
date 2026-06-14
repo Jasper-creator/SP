@@ -41,3 +41,11 @@ export interface AppNotification {
   createdAt: number;
   read: Partial<Record<UserId, boolean>>;
 }
+
+export interface ListItem {
+  id: string;
+  name: string;
+  emoji: string;
+  addedBy: UserId;
+  addedAt: number;
+}

@@ -5,13 +5,14 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  SafeAreaView,
+  Image,
   TextInput,
   Modal,
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUser } from '../src/context/UserContext';
 import {
   watchRecipes,
@@ -124,9 +125,11 @@ export default function TehdaanRuokaaScreen({ onBack }: Props) {
               <View style={styles.recipeMeta}>
                 <Text style={styles.recipeTag}>{r.category}</Text>
                 <Text style={styles.recipeTime}>⏱ {r.time}</Text>
-                <Text style={styles.recipeBy}>
-                  {r.addedBy === 'jasper' ? '👦' : '👧'}
-                </Text>
+                <Image
+                  source={r.addedBy === 'jasper' ? require('../Images/Boy.webp') : require('../Images/Girl.webp')}
+                  style={styles.recipeByImage}
+                  resizeMode="contain"
+                />
               </View>
             </View>
             <Text style={styles.arrow}>›</Text>
@@ -152,10 +155,13 @@ export default function TehdaanRuokaaScreen({ onBack }: Props) {
               <View style={styles.detailMetaRow}>
                 <View style={styles.metaTag}><Text style={styles.metaTagText}>📂 {selectedRecipe.category}</Text></View>
                 <View style={styles.metaTag}><Text style={styles.metaTagText}>⏱ {selectedRecipe.time}</Text></View>
-                <View style={styles.metaTag}>
-                  <Text style={styles.metaTagText}>
-                    {selectedRecipe.addedBy === 'jasper' ? '👦 Jasper' : '👧 Senja'}
-                  </Text>
+                <View style={[styles.metaTag, styles.metaTagRow]}>
+                  <Image
+                    source={selectedRecipe.addedBy === 'jasper' ? require('../Images/Boy.webp') : require('../Images/Girl.webp')}
+                    style={styles.metaTagImage}
+                    resizeMode="contain"
+                  />
+                  <Text style={styles.metaTagText}>{selectedRecipe.addedBy === 'jasper' ? 'Jasper' : 'Senja'}</Text>
                 </View>
               </View>
               <Text style={styles.sectionTitle}>Ainekset</Text>
@@ -234,7 +240,7 @@ export default function TehdaanRuokaaScreen({ onBack }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFF5F7' },
+  container: { flex: 1, backgroundColor: 'transparent' },
   loadingCenter: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   header: { paddingHorizontal: 24, paddingTop: 16, paddingBottom: 12 },
   backBtn: { marginBottom: 12 },
@@ -255,7 +261,9 @@ const styles = StyleSheet.create({
   recipeMeta: { flexDirection: 'row', gap: 10, marginTop: 5, alignItems: 'center' },
   recipeTag: { fontSize: 12, color: '#FF8C69', fontWeight: '600' },
   recipeTime: { fontSize: 12, color: '#AAA' },
-  recipeBy: { fontSize: 14 },
+  recipeByImage: { width: 22, height: 22 },
+  metaTagRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  metaTagImage: { width: 18, height: 18 },
   arrow: { fontSize: 24, color: '#DDD' },
   modalContainer: { flex: 1, backgroundColor: '#FFF5F7' },
   modalHeader: {

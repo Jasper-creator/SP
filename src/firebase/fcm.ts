@@ -1,20 +1,27 @@
-import messaging from '@react-native-firebase/messaging';
-import { Platform } from 'react-native';
+import {
+  getMessaging,
+  getToken,
+  onMessage,
+  onTokenRefresh,
+  requestPermission,
+  setBackgroundMessageHandler,
+  AuthorizationStatus,
+} from '@react-native-firebase/messaging';
 import { UserId } from '../types';
 import { saveFcmToken } from './db';
 
 export async function initFCM(userId: UserId): Promise<void> {
-  const authStatus = await messaging().requestPermission();
+  const authStatus = await requestPermission(getMessaging());
   const enabled =
-    authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-    authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+    authStatus === AuthorizationStatus.AUTHORIZED ||
+    authStatus === AuthorizationStatus.PROVISIONAL;
 
   if (!enabled) return;
 
-  const token = await messaging().getToken();
+  const token = await getToken(getMessaging());
   await saveFcmToken(userId, token);
 
-  messaging().onTokenRefresh(async newToken => {
+  onTokenRefresh(getMessaging(), async newToken => {
     await saveFcmToken(userId, newToken);
   });
 }
@@ -22,7 +29,7 @@ export async function initFCM(userId: UserId): Promise<void> {
 export function onForegroundMessage(
   handler: (title: string, body: string) => void,
 ): () => void {
-  return messaging().onMessage(async remoteMessage => {
+  return onMessage(getMessaging(), async remoteMessage => {
     const title = remoteMessage.notification?.title ?? '';
     const body = remoteMessage.notification?.body ?? '';
     handler(title, body);
@@ -31,7 +38,7 @@ export function onForegroundMessage(
 
 // Must be called outside of any component (at app root level)
 export function registerBackgroundHandler(): void {
-  messaging().setBackgroundMessageHandler(async () => {});
+  setBackgroundMessageHandler(getMessaging(), async () => {});
 }
 
 export function getPartnerName(userId: UserId): string {
