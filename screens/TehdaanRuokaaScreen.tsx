@@ -1,25 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  Image,
-  TextInput,
-  Modal,
-  KeyboardAvoidingView,
-  Platform,
   ActivityIndicator,
+  Image,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { lightShadow } from '../Components/BasicView';
 import { useUser } from '../src/context/UserContext';
 import {
-  watchRecipes,
   addRecipe,
   deleteRecipe,
   seedDefaultRecipes,
   sendNotification,
+  watchRecipes,
 } from '../src/firebase/db';
 import { getPartnerId } from '../src/firebase/fcm';
 import { Recipe } from '../src/types';
@@ -60,21 +61,30 @@ export default function TehdaanRuokaaScreen({ onBack }: Props) {
         emoji: newEmoji || '🍽',
         category: newCategory.trim() || 'Oma resepti',
         time: newTime.trim() || '?',
-        ingredients: newIngredients.split('\n').map(s => s.trim()).filter(Boolean),
+        ingredients: newIngredients
+          .split('\n')
+          .map(s => s.trim())
+          .filter(Boolean),
         instructions: newInstructions.trim(),
         addedBy: userId,
         addedAt: Date.now(),
       });
       await sendNotification({
         to: getPartnerId(userId),
-        message: `${myName} lisäsi uuden reseptin: ${newEmoji || '🍽'} ${newName.trim()}`,
+        message: `${myName} lisäsi uuden reseptin: ${
+          newEmoji || '🍽'
+        } ${newName.trim()}`,
         type: 'ruoka',
         from: userId,
         createdAt: Date.now(),
         read: {},
       });
-      setNewName(''); setNewEmoji('🍽'); setNewCategory('');
-      setNewTime(''); setNewIngredients(''); setNewInstructions('');
+      setNewName('');
+      setNewEmoji('🍽');
+      setNewCategory('');
+      setNewTime('');
+      setNewIngredients('');
+      setNewInstructions('');
       setShowAdd(false);
     } finally {
       setSaving(false);
@@ -104,18 +114,24 @@ export default function TehdaanRuokaaScreen({ onBack }: Props) {
         </TouchableOpacity>
         <View style={styles.headerRow}>
           <Text style={styles.title}>👨‍🍳 Reseptit</Text>
-          <TouchableOpacity style={styles.addBtn} onPress={() => setShowAdd(true)}>
+          <TouchableOpacity
+            style={styles.addBtn}
+            onPress={() => setShowAdd(true)}
+          >
             <Text style={styles.addBtnText}>+ Lisää</Text>
           </TouchableOpacity>
         </View>
         <Text style={styles.subtitle}>{recipes.length} reseptiä</Text>
       </View>
 
-      <ScrollView contentContainerStyle={styles.list} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.list}
+        showsVerticalScrollIndicator={false}
+      >
         {recipes.map(r => (
           <TouchableOpacity
             key={r.id}
-            style={styles.recipeCard}
+            style={[lightShadow, styles.recipeCard]}
             onPress={() => setSelectedRecipe(r)}
             activeOpacity={0.8}
           >
@@ -126,7 +142,11 @@ export default function TehdaanRuokaaScreen({ onBack }: Props) {
                 <Text style={styles.recipeTag}>{r.category}</Text>
                 <Text style={styles.recipeTime}>⏱ {r.time}</Text>
                 <Image
-                  source={r.addedBy === 'jasper' ? require('../Images/Boy.webp') : require('../Images/Girl.webp')}
+                  source={
+                    r.addedBy === 'jasper'
+                      ? require('../Images/Boy.webp')
+                      : require('../Images/Girl.webp')
+                  }
                   style={styles.recipeByImage}
                   resizeMode="contain"
                 />
@@ -153,15 +173,29 @@ export default function TehdaanRuokaaScreen({ onBack }: Props) {
               <Text style={styles.detailEmoji}>{selectedRecipe.emoji}</Text>
               <Text style={styles.detailName}>{selectedRecipe.name}</Text>
               <View style={styles.detailMetaRow}>
-                <View style={styles.metaTag}><Text style={styles.metaTagText}>📂 {selectedRecipe.category}</Text></View>
-                <View style={styles.metaTag}><Text style={styles.metaTagText}>⏱ {selectedRecipe.time}</Text></View>
+                <View style={styles.metaTag}>
+                  <Text style={styles.metaTagText}>
+                    📂 {selectedRecipe.category}
+                  </Text>
+                </View>
+                <View style={styles.metaTag}>
+                  <Text style={styles.metaTagText}>
+                    ⏱ {selectedRecipe.time}
+                  </Text>
+                </View>
                 <View style={[styles.metaTag, styles.metaTagRow]}>
                   <Image
-                    source={selectedRecipe.addedBy === 'jasper' ? require('../Images/Boy.webp') : require('../Images/Girl.webp')}
+                    source={
+                      selectedRecipe.addedBy === 'jasper'
+                        ? require('../Images/Boy.webp')
+                        : require('../Images/Girl.webp')
+                    }
                     style={styles.metaTagImage}
                     resizeMode="contain"
                   />
-                  <Text style={styles.metaTagText}>{selectedRecipe.addedBy === 'jasper' ? 'Jasper' : 'Senja'}</Text>
+                  <Text style={styles.metaTagText}>
+                    {selectedRecipe.addedBy === 'jasper' ? 'Jasper' : 'Senja'}
+                  </Text>
                 </View>
               </View>
               <Text style={styles.sectionTitle}>Ainekset</Text>
@@ -172,7 +206,9 @@ export default function TehdaanRuokaaScreen({ onBack }: Props) {
                 </View>
               ))}
               <Text style={styles.sectionTitle}>Ohje</Text>
-              <Text style={styles.instructions}>{selectedRecipe.instructions}</Text>
+              <Text style={styles.instructions}>
+                {selectedRecipe.instructions}
+              </Text>
             </ScrollView>
           </SafeAreaView>
         </Modal>
@@ -181,7 +217,10 @@ export default function TehdaanRuokaaScreen({ onBack }: Props) {
       {/* Add Recipe */}
       {showAdd && (
         <Modal animationType="slide">
-          <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+          <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          >
             <SafeAreaView style={styles.modalContainer}>
               <View style={styles.modalHeader}>
                 <TouchableOpacity onPress={() => setShowAdd(false)}>
@@ -189,34 +228,60 @@ export default function TehdaanRuokaaScreen({ onBack }: Props) {
                 </TouchableOpacity>
                 <Text style={styles.modalTitle}>Uusi resepti</Text>
                 <TouchableOpacity onPress={handleAdd} disabled={saving}>
-                  {saving
-                    ? <ActivityIndicator color="#FF8C69" />
-                    : <Text style={styles.saveText}>Tallenna</Text>
-                  }
+                  {saving ? (
+                    <ActivityIndicator color="#FF8C69" />
+                  ) : (
+                    <Text style={styles.saveText}>Tallenna</Text>
+                  )}
                 </TouchableOpacity>
               </View>
-              <ScrollView contentContainerStyle={styles.formContent} keyboardShouldPersistTaps="handled">
+              <ScrollView
+                contentContainerStyle={styles.formContent}
+                keyboardShouldPersistTaps="handled"
+              >
                 <View style={styles.emojiRow}>
                   <View style={styles.emojiField}>
                     <Text style={styles.fieldLabel}>Emoji</Text>
-                    <TextInput style={[styles.input, styles.emojiInput]} value={newEmoji} onChangeText={setNewEmoji} />
+                    <TextInput
+                      style={[styles.input, styles.emojiInput]}
+                      value={newEmoji}
+                      onChangeText={setNewEmoji}
+                    />
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text style={styles.fieldLabel}>Kategoria</Text>
-                    <TextInput style={styles.input} value={newCategory} onChangeText={setNewCategory} placeholder="esim. Pasta, Keitto..." placeholderTextColor="#CCC" />
+                    <TextInput
+                      style={styles.input}
+                      value={newCategory}
+                      onChangeText={setNewCategory}
+                      placeholder="esim. Pasta, Keitto..."
+                      placeholderTextColor="'rgba(0,0,0,0.36)'"
+                    />
                   </View>
                 </View>
                 <Text style={styles.fieldLabel}>Nimi *</Text>
-                <TextInput style={styles.input} value={newName} onChangeText={setNewName} placeholder="Reseptin nimi" placeholderTextColor="#CCC" />
+                <TextInput
+                  style={styles.input}
+                  value={newName}
+                  onChangeText={setNewName}
+                  placeholder="Reseptin nimi"
+                  placeholderTextColor="'rgba(0,0,0,0.36)'"
+                />
                 <Text style={styles.fieldLabel}>Valmistusaika</Text>
-                <TextInput style={styles.input} value={newTime} onChangeText={setNewTime} placeholder="esim. 30 min" placeholderTextColor="#CCC" />
+                <TextInput
+                  style={styles.input}
+                  value={newTime}
+                  onChangeText={setNewTime}
+                  placeholder="esim. 30 min"
+                  placeholderTextColor="'rgba(0,0,0,0.36)'"
+                />
                 <Text style={styles.fieldLabel}>Ainekset (yksi per rivi)</Text>
                 <TextInput
                   style={[styles.input, styles.textArea]}
                   value={newIngredients}
                   onChangeText={setNewIngredients}
                   placeholder={'200 g jauhelihaa\n1 sipuli\n...'}
-                  placeholderTextColor="#CCC"
+                  placeholderTextColor="'rgba(0,0,0,0.36)'"
                   multiline
                   textAlignVertical="top"
                 />
@@ -226,7 +291,7 @@ export default function TehdaanRuokaaScreen({ onBack }: Props) {
                   value={newInstructions}
                   onChangeText={setNewInstructions}
                   placeholder="Kirjoita ohjeet tähän..."
-                  placeholderTextColor="#CCC"
+                  placeholderTextColor="'rgba(0,0,0,0.36)'"
                   multiline
                   textAlignVertical="top"
                 />
@@ -244,52 +309,130 @@ const styles = StyleSheet.create({
   loadingCenter: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   header: { paddingHorizontal: 24, paddingTop: 16, paddingBottom: 12 },
   backBtn: { marginBottom: 12 },
-  backText: { color: '#FF6B9D', fontSize: 16, fontWeight: '600' },
-  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  backText: { color: 'rgba(0,0,0,0.36)', fontSize: 16, fontWeight: '600' },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   title: { fontSize: 28, fontWeight: '800', color: '#222' },
-  subtitle: { fontSize: 13, color: '#AAA', marginTop: 4 },
-  addBtn: { backgroundColor: '#FF8C69', borderRadius: 14, paddingHorizontal: 18, paddingVertical: 9 },
+  subtitle: { fontSize: 13, color: 'rgba(0,0,0,0.36)', marginTop: 4 },
+  addBtn: {
+    backgroundColor: '#FF8C69',
+    borderRadius: 14,
+    paddingHorizontal: 18,
+    paddingVertical: 9,
+  },
   addBtnText: { color: '#fff', fontWeight: '700', fontSize: 14 },
   list: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 32, gap: 12 },
   recipeCard: {
-    backgroundColor: '#fff', borderRadius: 18, padding: 16, flexDirection: 'row', alignItems: 'center',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.07, shadowRadius: 5, elevation: 2,
+    backgroundColor: 'rgba(255,255,255,0.5)',
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'white',
+    overflow: 'hidden',
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   recipeEmoji: { fontSize: 42, marginRight: 14 },
   recipeInfo: { flex: 1 },
   recipeName: { fontSize: 17, fontWeight: '700', color: '#222' },
-  recipeMeta: { flexDirection: 'row', gap: 10, marginTop: 5, alignItems: 'center' },
+  recipeMeta: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 5,
+    alignItems: 'center',
+  },
   recipeTag: { fontSize: 12, color: '#FF8C69', fontWeight: '600' },
-  recipeTime: { fontSize: 12, color: '#AAA' },
+  recipeTime: { fontSize: 12, color: 'rgba(0,0,0,0.36)' },
   recipeByImage: { width: 22, height: 22 },
   metaTagRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   metaTagImage: { width: 18, height: 18 },
   arrow: { fontSize: 24, color: '#DDD' },
   modalContainer: { flex: 1, backgroundColor: '#FFF5F7' },
   modalHeader: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingHorizontal: 20, paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: '#F0F0F0',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
   },
   deleteText: { color: '#FF6B6B', fontSize: 14, fontWeight: '600' },
   modalTitle: { fontSize: 17, fontWeight: '700', color: '#222' },
   saveText: { color: '#FF8C69', fontSize: 16, fontWeight: '700' },
   detailContent: { padding: 24 },
   detailEmoji: { fontSize: 80, textAlign: 'center', marginBottom: 12 },
-  detailName: { fontSize: 28, fontWeight: '800', color: '#222', textAlign: 'center', marginBottom: 14 },
-  detailMetaRow: { flexDirection: 'row', justifyContent: 'center', gap: 8, marginBottom: 28, flexWrap: 'wrap' },
-  metaTag: { backgroundColor: '#F5F5F5', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 6 },
+  detailName: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#222',
+    textAlign: 'center',
+    marginBottom: 14,
+  },
+  detailMetaRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
+    marginBottom: 28,
+    flexWrap: 'wrap',
+  },
+  metaTag: {
+    backgroundColor: '#F5F5F5',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
   metaTagText: { fontSize: 13, color: '#666', fontWeight: '600' },
-  sectionTitle: { fontSize: 20, fontWeight: '800', color: '#222', marginBottom: 12, marginTop: 8 },
-  ingredientRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 8 },
-  bullet: { width: 7, height: 7, borderRadius: 3.5, backgroundColor: '#FF8C69', marginTop: 7, marginRight: 10 },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#222',
+    marginBottom: 12,
+    marginTop: 8,
+  },
+  ingredientRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+  },
+  bullet: {
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
+    backgroundColor: '#FF8C69',
+    marginTop: 7,
+    marginRight: 10,
+  },
   ingredientText: { fontSize: 15, color: '#444', flex: 1, lineHeight: 22 },
-  instructions: { fontSize: 15, color: '#444', lineHeight: 26, marginBottom: 32 },
+  instructions: {
+    fontSize: 15,
+    color: '#444',
+    lineHeight: 26,
+    marginBottom: 32,
+  },
   formContent: { padding: 20, gap: 6 },
   emojiRow: { flexDirection: 'row', gap: 12, marginBottom: 4 },
   emojiField: { width: 80 },
   emojiInput: { textAlign: 'center', fontSize: 28 },
-  fieldLabel: { fontSize: 13, fontWeight: '700', color: '#555', marginBottom: 4, marginTop: 10 },
-  input: { backgroundColor: '#fff', borderRadius: 14, padding: 14, fontSize: 15, borderWidth: 1, borderColor: '#EEE', color: '#222' },
+  fieldLabel: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#555',
+    marginBottom: 4,
+    marginTop: 10,
+  },
+  input: {
+    backgroundColor: '#fff',
+    borderRadius: 14,
+    padding: 14,
+    fontSize: 15,
+    borderWidth: 1,
+    borderColor: '#EEE',
+    color: '#222',
+  },
   textArea: { height: 110, textAlignVertical: 'top' },
   textAreaLarge: { height: 150, textAlignVertical: 'top' },
 });

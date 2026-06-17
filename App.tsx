@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
   ImageBackground,
+  Modal,
   StatusBar,
   StyleSheet,
   Text,
@@ -9,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import BasicView, { fontFamily, lightShadow } from './Components/BasicView';
 import HomeScreen from './screens/HomeScreen';
 import KauppalistaScreen from './screens/KauppalistaScreen';
 import KohdelistaScreen from './screens/KohdelistaScreen';
@@ -49,8 +52,37 @@ function AppContent() {
   const [screen, setScreen] = useState<Screen>('home');
   const [banner, setBanner] = useState<Banner | null>(null);
   const bannerOpacity = useState(new Animated.Value(0))[0];
+  const [showBirthday, setShowBirthday] = useState(false);
+  const birthdayScale = useRef(new Animated.Value(0.85)).current;
+  const birthdayOpacity = useRef(new Animated.Value(0)).current;
 
   const goBack = () => setScreen('home');
+
+  useEffect(() => {
+    if (userId !== 'senja') return;
+    AsyncStorage.getItem('birthday_senja_24').then(val => {
+      if (!val) {
+        setShowBirthday(true);
+        Animated.parallel([
+          Animated.spring(birthdayScale, {
+            toValue: 1,
+            useNativeDriver: true,
+            bounciness: 12,
+          }),
+          Animated.timing(birthdayOpacity, {
+            toValue: 1,
+            duration: 350,
+            useNativeDriver: true,
+          }),
+        ]).start();
+      }
+    });
+  }, [userId]);
+
+  const dismissBirthday = async () => {
+    await AsyncStorage.setItem('birthday_senja_24', 'true');
+    setShowBirthday(false);
+  };
 
   useEffect(() => {
     if (!userId) return;
@@ -109,6 +141,43 @@ function AppContent() {
           </TouchableOpacity>
         </Animated.View>
       )}
+
+      {showBirthday && (
+        <Modal transparent animationType="none">
+          <ImageBackground
+            source={require('./Images/Background.webp')}
+            style={styles.bdayOverlay}
+            resizeMode="cover"
+          >
+            <Animated.View
+              style={{
+                transform: [{ scale: birthdayScale }],
+                opacity: birthdayOpacity,
+              }}
+            >
+              <BasicView style={styles.bdayCard}>
+                <Text style={styles.bdayCake}>🎂</Text>
+                <Text style={styles.bdayTitle}>
+                  Hyvää 24V Syntymäpäivää{'\n'}Senja! 🎉
+                </Text>
+                <Text style={styles.bdayMsg}>
+                  Teit maailmasta paremman paikan{'\n'}
+                  syntymällä siihen. Rakastan sua{'\n'}
+                  enemmän kuin osaat kuvitella. 💕
+                </Text>
+                <Text style={styles.bdayFrom}>— Jasper</Text>
+                <TouchableOpacity
+                  style={[lightShadow, styles.bdayBtn]}
+                  onPress={dismissBirthday}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.bdayBtnText}>Kiitos, Raksu 🥰</Text>
+                </TouchableOpacity>
+              </BasicView>
+            </Animated.View>
+          </ImageBackground>
+        </Modal>
+      )}
     </View>
   );
 }
@@ -162,4 +231,61 @@ const styles = StyleSheet.create({
   },
   bannerBody: { color: 'rgba(255,255,255,0.8)', fontSize: 13 },
   bannerClose: { color: '#888', fontSize: 16, padding: 4 },
+  bdayOverlay: {
+    flex: 1,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 28,
+  },
+  bdayCard: {
+    alignItems: 'center',
+    padding: 36,
+    gap: 10,
+  },
+  bdayCake: { fontSize: 80, marginBottom: 4 },
+  bdayTitle: {
+    fontSize: 28,
+    fontFamily: fontFamily.bold,
+    color: '#222',
+    textAlign: 'center',
+    lineHeight: 36,
+  },
+  bdayAge: {
+    fontSize: 16,
+    fontFamily: fontFamily.semiBold,
+    color: 'rgba(0,0,0,0.36)',
+    marginBottom: 4,
+  },
+  bdayMsg: {
+    fontSize: 16,
+    fontFamily: fontFamily.medium,
+    color: '#444',
+    textAlign: 'center',
+    lineHeight: 24,
+    marginTop: 4,
+  },
+  bdayFrom: {
+    fontSize: 18,
+    fontFamily: fontFamily.bold,
+    color: '#000',
+    marginTop: 6,
+  },
+  bdayBtn: {
+    marginTop: 10,
+    backgroundColor: 'rgba(255,255,255,0.5)',
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'white',
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+    overflow: 'hidden',
+    alignSelf: 'stretch',
+    alignItems: 'center',
+  },
+  bdayBtnText: {
+    fontSize: 16,
+    fontFamily: fontFamily.bold,
+    color: '#222',
+  },
 });

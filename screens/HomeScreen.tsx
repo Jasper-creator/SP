@@ -7,8 +7,9 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Screen } from '../App';
+import { fontFamily } from '../Components/BasicView';
+import { useStyles } from '../Components/Styles';
 import { useUser } from '../src/context/UserContext';
 import { watchNotifications } from '../src/firebase/db';
 import { AppNotification } from '../src/types';
@@ -21,15 +22,15 @@ const categories = [
   {
     id: 'treffit',
     label: 'Treffit',
-    image: require('../Images/treffi.webp'),
-    color: '#FF6B9D',
+    image: require('../Images/Treffi.webp'),
+    color: 'rgba(0,0,0,0.36)',
     bg: '#FFE4EE',
     description: 'Suunnittele yhteinen ilta',
   },
   {
     id: 'ruoka',
     label: 'Tehdään Ruokaa',
-    image: require('../Images/kokki.webp'),
+    image: require('../Images/Kokki.webp'),
     color: '#FF8C69',
     bg: '#FFE8D6',
     description: 'Reseptit ja valmistusohjeet',
@@ -37,7 +38,7 @@ const categories = [
   {
     id: 'kauppalista',
     label: 'Kauppalista',
-    image: require('../Images/kauppa.webp'),
+    image: require('../Images/Kauppa.webp'),
     color: '#5BB8D4',
     bg: '#D6EFF8',
     description: 'Ostokset helposti listaan',
@@ -53,7 +54,7 @@ const categories = [
   {
     id: 'leffalista',
     label: 'Leffalista',
-    image: require('../Images/elokuva.webp'),
+    image: require('../Images/Elokuva.webp'),
     color: '#7B61FF',
     bg: '#EDE8FF',
     description: 'Leffavinkit odottamassa',
@@ -62,7 +63,7 @@ const categories = [
     id: 'kohdelista',
     label: 'Kohdelista',
     image: require('../Images/Kartta.webp'),
-    color: '#E8820C',
+    color: 'rgba(0,0,0,0.36)',
     bg: '#FFF0DE',
     description: 'Paikat joissa halutaan käydä',
   },
@@ -70,6 +71,7 @@ const categories = [
 
 export default function HomeScreen({ onNavigate }: Props) {
   const { userId, logout } = useUser();
+  const styles1 = useStyles();
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
 
   useEffect(() => {
@@ -84,12 +86,14 @@ export default function HomeScreen({ onNavigate }: Props) {
   const displayName = userId === 'jasper' ? 'Jasper' : 'Senja';
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View>
       <View style={styles.header}>
         <View style={styles.headerRow}>
-          <View>
+          <View style={{ marginTop: 50 }}>
             <Text style={styles.greeting}>Hei {displayName}! 💕</Text>
-            <Text style={styles.subtitle}>Mitä tehdään tänään?</Text>
+            <Text style={[styles.subtitle, { color: styles1.Black36.color }]}>
+              Mitä tehdään tänään?
+            </Text>
           </View>
           <View style={styles.headerActions}>
             <TouchableOpacity
@@ -123,20 +127,24 @@ export default function HomeScreen({ onNavigate }: Props) {
             onPress={() => onNavigate(cat.id as Screen)}
             activeOpacity={0.82}
           >
-            <View style={[styles.iconCircle, { backgroundColor: cat.color }]}>
-              <Image source={cat.image} style={styles.categoryImage} resizeMode="contain" />
-            </View>
+            {/* <View style={[styles.iconCircle, { backgroundColor: cat.color }]}> */}
+            <Image
+              source={cat.image}
+              style={styles.iconCircle}
+              resizeMode="contain"
+            />
+            {/* </View> */}
             <View style={styles.cardText}>
-              <Text style={[styles.cardTitle, { color: cat.color }]}>
-                {cat.label}
+              <Text style={styles.cardTitle}>{cat.label}</Text>
+              <Text style={[styles.cardDesc, { color: styles1.Black36.color }]}>
+                {cat.description}
               </Text>
-              <Text style={styles.cardDesc}>{cat.description}</Text>
             </View>
             <Text style={[styles.arrow, { color: cat.color }]}>›</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -148,13 +156,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
   },
-  greeting: { fontSize: 30, fontWeight: '800', color: '#222', marginBottom: 4 },
-  subtitle: { fontSize: 16, color: '#999', fontWeight: '500' },
+  greeting: {
+    fontSize: 30,
+    color: 'black',
+    marginBottom: 4,
+    fontFamily: fontFamily.bold,
+  },
+  subtitle: { fontSize: 17, fontFamily: fontFamily.semiBold },
   headerActions: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    marginTop: 4,
+    marginTop: 50,
   },
   notifBtn: { position: 'relative', padding: 6 },
   notifIcon: { fontSize: 26 },
@@ -162,7 +175,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     right: 0,
-    backgroundColor: '#FF6B9D',
+    backgroundcolor: 'rgba(0,0,0,0.36)',
     borderRadius: 10,
     minWidth: 20,
     height: 20,
@@ -177,8 +190,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
   },
-  logoutText: { color: '#888', fontSize: 13, fontWeight: '600' },
-  grid: { paddingHorizontal: 20, paddingBottom: 32, gap: 14 },
+  logoutText: { fontSize: 13, fontFamily: fontFamily.semiBold },
+  grid: {
+    paddingHorizontal: 20,
+    paddingBottom: 102,
+    gap: 15,
+  },
   card: {
     borderRadius: 22,
     padding: 20,

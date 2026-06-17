@@ -12,15 +12,29 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import BasicView, { lightShadow } from '../Components/BasicView';
 import { useUser } from '../src/context/UserContext';
 import {
-  watchKohdelista,
   addKohdeItem,
   deleteKohdeItem,
+  watchKohdelista,
 } from '../src/firebase/db';
 import { ListItem } from '../src/types';
 
-const EMOJI_OPTIONS = ['📍', '🏔', '🏖', '🌇', '🏰', '🍽', '☕', '🌳', '🎡', '🏛', '🌅', '🛍'];
+const EMOJI_OPTIONS = [
+  '📍',
+  '🏔',
+  '🏖',
+  '🌇',
+  '🏰',
+  '🍽',
+  '☕',
+  '🌳',
+  '🎡',
+  '🏛',
+  '🌅',
+  '🛍',
+];
 
 interface Props {
   onBack: () => void;
@@ -78,7 +92,10 @@ export default function KohdelistaScreen({ onBack }: Props) {
         </TouchableOpacity>
         <View style={styles.headerRow}>
           <Text style={styles.title}>📍 Kohdelista</Text>
-          <TouchableOpacity style={styles.addBtn} onPress={() => setShowAdd(true)}>
+          <TouchableOpacity
+            style={styles.addBtn}
+            onPress={() => setShowAdd(true)}
+          >
             <Text style={styles.addBtnText}>+ Lisää</Text>
           </TouchableOpacity>
         </View>
@@ -89,18 +106,26 @@ export default function KohdelistaScreen({ onBack }: Props) {
         <View style={styles.empty}>
           <Text style={styles.emptyEmoji}>📍</Text>
           <Text style={styles.emptyText}>Lista on tyhjä!</Text>
-          <Text style={styles.emptyHint}>Lisää kohteita + Lisää painikkeesta</Text>
+          <Text style={styles.emptyHint}>
+            Lisää kohteita + Lisää painikkeesta
+          </Text>
         </View>
       ) : (
-        <ScrollView contentContainerStyle={styles.list} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={styles.list}
+          showsVerticalScrollIndicator={false}
+        >
           {items.map(item => (
-            <View key={item.id} style={styles.itemCard}>
+            <BasicView key={item.id} style={styles.itemCard}>
               <Text style={styles.itemEmoji}>{item.emoji}</Text>
               <Text style={styles.itemName}>{item.name}</Text>
-              <TouchableOpacity onPress={() => deleteKohdeItem(item.id)} style={styles.removeBtn}>
+              <TouchableOpacity
+                onPress={() => deleteKohdeItem(item.id)}
+                style={styles.removeBtn}
+              >
                 <Text style={styles.removeText}>✕</Text>
               </TouchableOpacity>
-            </View>
+            </BasicView>
           ))}
         </ScrollView>
       )}
@@ -116,7 +141,10 @@ export default function KohdelistaScreen({ onBack }: Props) {
               activeOpacity={1}
               onPress={() => setShowAdd(false)}
             >
-              <TouchableOpacity activeOpacity={1} style={styles.sheet}>
+              <TouchableOpacity
+                activeOpacity={1}
+                style={[lightShadow, styles.sheet]}
+              >
                 <View style={styles.sheetHandle} />
                 <Text style={styles.sheetTitle}>Lisää kohde</Text>
 
@@ -124,18 +152,25 @@ export default function KohdelistaScreen({ onBack }: Props) {
                 <TextInput
                   style={styles.input}
                   placeholder="esim. Korkeasaari"
-                  placeholderTextColor="#CCC"
+                  placeholderTextColor="'rgba(0,0,0,0.36)'"
                   value={newName}
                   onChangeText={setNewName}
                   autoFocus
                 />
 
                 <Text style={styles.fieldLabel}>Emoji</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.emojiRow}>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.emojiRow}
+                >
                   {EMOJI_OPTIONS.map(e => (
                     <TouchableOpacity
                       key={e}
-                      style={[styles.emojiBtn, newEmoji === e && styles.emojiBtnActive]}
+                      style={[
+                        styles.emojiBtn,
+                        newEmoji === e && styles.emojiBtnActive,
+                      ]}
                       onPress={() => setNewEmoji(e)}
                     >
                       <Text style={styles.emojiText}>{e}</Text>
@@ -143,11 +178,16 @@ export default function KohdelistaScreen({ onBack }: Props) {
                   ))}
                 </ScrollView>
 
-                <TouchableOpacity style={styles.saveBtn} onPress={handleAdd} disabled={saving}>
-                  {saving
-                    ? <ActivityIndicator color="#fff" />
-                    : <Text style={styles.saveBtnText}>Lisää listaan</Text>
-                  }
+                <TouchableOpacity
+                  style={styles.saveBtn}
+                  onPress={handleAdd}
+                  disabled={saving}
+                >
+                  {saving ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Text style={styles.saveBtnText}>Lisää listaan</Text>
+                  )}
                 </TouchableOpacity>
               </TouchableOpacity>
             </TouchableOpacity>
@@ -163,43 +203,91 @@ const styles = StyleSheet.create({
   loadingCenter: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   header: { paddingHorizontal: 24, paddingTop: 16, paddingBottom: 12 },
   backBtn: { marginBottom: 12 },
-  backText: { color: '#E8820C', fontSize: 16, fontWeight: '600' },
-  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  backText: { color: 'rgba(0,0,0,0.36)', fontSize: 16, fontWeight: '600' },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   title: { fontSize: 28, fontWeight: '800', color: '#222' },
-  addBtn: { backgroundColor: '#E8820C', borderRadius: 14, paddingHorizontal: 18, paddingVertical: 9 },
+  addBtn: {
+    backgroundcolor: 'rgba(0,0,0,0.36)',
+    borderRadius: 14,
+    paddingHorizontal: 18,
+    paddingVertical: 9,
+  },
   addBtnText: { color: '#fff', fontWeight: '700', fontSize: 14 },
-  subtitle: { color: '#AAA', fontSize: 13, marginTop: 4 },
+  subtitle: { color: 'rgba(0,0,0,0.36)', fontSize: 13, marginTop: 4 },
   empty: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 8 },
   emptyEmoji: { fontSize: 56 },
   emptyText: { fontSize: 18, fontWeight: '700', color: '#333' },
-  emptyHint: { fontSize: 14, color: '#AAA' },
+  emptyHint: { fontSize: 14, color: 'rgba(0,0,0,0.36)' },
   list: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 32, gap: 10 },
   itemCard: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 3,
-    elevation: 1,
   },
   itemEmoji: { fontSize: 30, marginRight: 14 },
   itemName: { flex: 1, fontSize: 16, fontWeight: '600', color: '#222' },
   removeBtn: { padding: 6 },
   removeText: { fontSize: 15, color: '#DDD', fontWeight: '700' },
-  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'flex-end' },
-  sheet: { backgroundColor: '#fff', borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: 24, paddingBottom: 40, gap: 6 },
-  sheetHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: '#E0E0E0', alignSelf: 'center', marginBottom: 12 },
-  sheetTitle: { fontSize: 20, fontWeight: '800', color: '#222', marginBottom: 4 },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    justifyContent: 'flex-end',
+  },
+  sheet: {
+    backgroundColor: 'rgba(255,255,255,0.5)',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'white',
+    overflow: 'hidden',
+    padding: 24,
+    paddingBottom: 40,
+    gap: 6,
+  },
+  sheetHandle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#E0E0E0',
+    alignSelf: 'center',
+    marginBottom: 12,
+  },
+  sheetTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#222',
+    marginBottom: 4,
+  },
   fieldLabel: { fontSize: 13, fontWeight: '700', color: '#555', marginTop: 8 },
-  input: { backgroundColor: '#F8F8F8', borderRadius: 14, padding: 14, fontSize: 15, borderWidth: 1, borderColor: '#EEE', color: '#222' },
+  input: {
+    backgroundColor: '#F8F8F8',
+    borderRadius: 14,
+    padding: 14,
+    fontSize: 15,
+    borderWidth: 1,
+    borderColor: '#EEE',
+    color: '#222',
+  },
   emojiRow: { gap: 8, alignItems: 'center', paddingVertical: 4 },
-  emojiBtn: { width: 44, height: 44, borderRadius: 12, backgroundColor: '#F0F0F0', justifyContent: 'center', alignItems: 'center' },
-  emojiBtnActive: { backgroundColor: '#E8820C' },
+  emojiBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: '#F0F0F0',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emojiBtnActive: { backgroundcolor: 'rgba(0,0,0,0.36)' },
   emojiText: { fontSize: 22 },
-  saveBtn: { backgroundColor: '#E8820C', borderRadius: 16, padding: 16, alignItems: 'center', marginTop: 12 },
+  saveBtn: {
+    backgroundcolor: 'rgba(0,0,0,0.36)',
+    borderRadius: 16,
+    padding: 16,
+    alignItems: 'center',
+    marginTop: 12,
+  },
   saveBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 });

@@ -1,18 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import {
-  View,
+  ScrollView,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { lightShadow } from '../Components/BasicView';
 import { useUser } from '../src/context/UserContext';
-import {
-  watchNotifications,
-  markNotificationRead,
-} from '../src/firebase/db';
+import { markNotificationRead, watchNotifications } from '../src/firebase/db';
 import { AppNotification } from '../src/types';
 
 const TYPE_ICONS: Record<string, string> = {
@@ -80,7 +77,7 @@ export default function NotificationsScreen({ onBack }: Props) {
             return (
               <TouchableOpacity
                 key={n.id}
-                style={[styles.card, isUnread && styles.cardUnread]}
+                style={[lightShadow, styles.card, isUnread && styles.cardUnread]}
                 onPress={() => handleOpen(n)}
                 activeOpacity={0.8}
               >
@@ -90,7 +87,8 @@ export default function NotificationsScreen({ onBack }: Props) {
                 <View style={styles.cardContent}>
                   <Text style={styles.cardMessage}>{n.message}</Text>
                   <Text style={styles.cardMeta}>
-                    {n.from === 'jasper' ? 'Jasper' : 'Senja'} · {timeAgo(n.createdAt)}
+                    {n.from === 'jasper' ? 'Jasper' : 'Senja'} ·{' '}
+                    {timeAgo(n.createdAt)}
                   </Text>
                 </View>
                 {isUnread && <View style={styles.dot} />}
@@ -107,26 +105,24 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent' },
   header: { paddingHorizontal: 24, paddingTop: 16, paddingBottom: 12 },
   backBtn: { marginBottom: 12 },
-  backText: { color: '#FF6B9D', fontSize: 16, fontWeight: '600' },
+  backText: { color: 'rgba(0,0,0,0.36)', fontSize: 16, fontWeight: '600' },
   title: { fontSize: 28, fontWeight: '800', color: '#222' },
-  subtitle: { fontSize: 13, color: '#FF6B9D', marginTop: 4 },
+  subtitle: { fontSize: 13, color: 'rgba(0,0,0,0.36)', marginTop: 4 },
   empty: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 8 },
   emptyEmoji: { fontSize: 56 },
   emptyText: { fontSize: 18, fontWeight: '700', color: '#333' },
-  emptyHint: { fontSize: 13, color: '#AAA' },
+  emptyHint: { fontSize: 13, color: 'rgba(0,0,0,0.36)' },
   list: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 32, gap: 10 },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255,255,255,0.5)',
     borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'white',
+    overflow: 'hidden',
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
   },
   cardUnread: { backgroundColor: '#FFF0F5' },
   iconCircle: {
@@ -139,12 +135,17 @@ const styles = StyleSheet.create({
   },
   icon: { fontSize: 24 },
   cardContent: { flex: 1 },
-  cardMessage: { fontSize: 15, fontWeight: '600', color: '#222', marginBottom: 3 },
-  cardMeta: { fontSize: 12, color: '#AAA' },
+  cardMessage: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#222',
+    marginBottom: 3,
+  },
+  cardMeta: { fontSize: 12, color: 'rgba(0,0,0,0.36)' },
   dot: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: '#FF6B9D',
+    backgroundcolor: 'rgba(0,0,0,0.36)',
   },
 });

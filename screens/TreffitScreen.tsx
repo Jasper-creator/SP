@@ -9,11 +9,12 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import BasicView, { fontFamily, lightShadow } from '../Components/BasicView';
 import { useUser } from '../src/context/UserContext';
 import {
-  watchLeffalista,
-  watchKohdelista,
   sendNotification,
+  watchKohdelista,
+  watchLeffalista,
 } from '../src/firebase/db';
 import { getPartnerId, getPartnerName } from '../src/firebase/fcm';
 import { ListItem } from '../src/types';
@@ -22,9 +23,18 @@ type Step = 'datetime' | 'activity' | 'choice';
 type ActivityType = 'food' | 'sport' | 'leffa' | 'kohde';
 
 const MONTHS_FI = [
-  'Tammikuu', 'Helmikuu', 'Maaliskuu', 'Huhtikuu',
-  'Toukokuu', 'Kesäkuu', 'Heinäkuu', 'Elokuu',
-  'Syyskuu', 'Lokakuu', 'Marraskuu', 'Joulukuu',
+  'Tammikuu',
+  'Helmikuu',
+  'Maaliskuu',
+  'Huhtikuu',
+  'Toukokuu',
+  'Kesäkuu',
+  'Heinäkuu',
+  'Elokuu',
+  'Syyskuu',
+  'Lokakuu',
+  'Marraskuu',
+  'Joulukuu',
 ];
 const DAYS_SHORT = ['Ma', 'Ti', 'Ke', 'To', 'Pe', 'La', 'Su'];
 const WEEKDAY_SHORT = ['Su', 'Ma', 'Ti', 'Ke', 'To', 'Pe', 'La'];
@@ -102,7 +112,10 @@ export default function TreffitScreen({ onBack }: Props) {
   const [activityType, setActivityType] = useState<ActivityType | null>(null);
 
   // Confirmation state
-  const [selectedItem, setSelectedItem] = useState<{ label: string; emoji: string } | null>(null);
+  const [selectedItem, setSelectedItem] = useState<{
+    label: string;
+    emoji: string;
+  } | null>(null);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
 
@@ -113,12 +126,21 @@ export default function TreffitScreen({ onBack }: Props) {
   useEffect(() => {
     const u1 = watchLeffalista(setLeffaItems);
     const u2 = watchKohdelista(setKohdeItems);
-    return () => { u1(); u2(); };
+    return () => {
+      u1();
+      u2();
+    };
   }, []);
 
   const handleBack = () => {
-    if (step === 'datetime') { onBack(); return; }
-    if (step === 'activity') { setStep('datetime'); return; }
+    if (step === 'datetime') {
+      onBack();
+      return;
+    }
+    if (step === 'activity') {
+      setStep('datetime');
+      return;
+    }
     setStep('activity');
     setActivityType(null);
   };
@@ -174,16 +196,20 @@ export default function TreffitScreen({ onBack }: Props) {
   const todayM = today.getMonth();
   const todayY = today.getFullYear();
 
-  const selectedDateStr = selectedDay !== null
-    ? formatDateShort(selectedYear, selectedMonth, selectedDay)
-    : null;
+  const selectedDateStr =
+    selectedDay !== null
+      ? formatDateShort(selectedYear, selectedMonth, selectedDay)
+      : null;
 
   const canProceed = selectedDay !== null;
 
   // ─── Step 1: Date + Time ──────────────────────────────────────────────────────
 
   const renderDateTimeStep = () => (
-    <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      contentContainerStyle={styles.scrollContent}
+      showsVerticalScrollIndicator={false}
+    >
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBack} style={styles.backBtn}>
           <Text style={styles.backText}>← Takaisin</Text>
@@ -196,35 +222,50 @@ export default function TreffitScreen({ onBack }: Props) {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Valitse päivä</Text>
         <TouchableOpacity
-          style={[styles.dateBtn, calendarVisible && styles.dateBtnActive]}
+          style={[
+            lightShadow,
+            styles.dateBtn,
+            calendarVisible && styles.dateBtnActive,
+          ]}
           onPress={() => setCalendarVisible(v => !v)}
         >
           <Text style={styles.dateBtnEmoji}>📅</Text>
-          <Text style={[styles.dateBtnText, !selectedDateStr && styles.dateBtnPlaceholder]}>
+          <Text
+            style={[
+              styles.dateBtnText,
+              !selectedDateStr && styles.dateBtnPlaceholder,
+            ]}
+          >
             {selectedDateStr ?? 'Valitse päivä'}
           </Text>
           <Text style={styles.dateBtnArrow}>{calendarVisible ? '▲' : '▼'}</Text>
         </TouchableOpacity>
 
         {calendarVisible && (
-          <View style={styles.calendar}>
+          <BasicView style={styles.calendar}>
             {/* Month navigation */}
             <View style={styles.calHeader}>
               <TouchableOpacity
                 style={styles.calNavBtn}
                 onPress={() => {
-                  if (calMonth === 0) { setCalMonth(11); setCalYear(y => y - 1); }
-                  else setCalMonth(m => m - 1);
+                  if (calMonth === 0) {
+                    setCalMonth(11);
+                    setCalYear(y => y - 1);
+                  } else setCalMonth(m => m - 1);
                 }}
               >
                 <Text style={styles.calNavText}>‹</Text>
               </TouchableOpacity>
-              <Text style={styles.calMonthText}>{MONTHS_FI[calMonth]} {calYear}</Text>
+              <Text style={styles.calMonthText}>
+                {MONTHS_FI[calMonth]} {calYear}
+              </Text>
               <TouchableOpacity
                 style={styles.calNavBtn}
                 onPress={() => {
-                  if (calMonth === 11) { setCalMonth(0); setCalYear(y => y + 1); }
-                  else setCalMonth(m => m + 1);
+                  if (calMonth === 11) {
+                    setCalMonth(0);
+                    setCalYear(y => y + 1);
+                  } else setCalMonth(m => m + 1);
                 }}
               >
                 <Text style={styles.calNavText}>›</Text>
@@ -244,22 +285,37 @@ export default function TreffitScreen({ onBack }: Props) {
             {calRows.map((row, ri) => (
               <View key={ri} style={styles.calRow}>
                 {row.map((day, di) => {
-                  const isPast = day !== null && new Date(calYear, calMonth, day) < new Date(todayY, todayM, todayD);
-                  const isToday = day === todayD && calMonth === todayM && calYear === todayY;
-                  const isSelected = day === selectedDay && calMonth === selectedMonth && calYear === selectedYear;
+                  const isPast =
+                    day !== null &&
+                    new Date(calYear, calMonth, day) <
+                      new Date(todayY, todayM, todayD);
+                  const isToday =
+                    day === todayD && calMonth === todayM && calYear === todayY;
+                  const isSelected =
+                    day === selectedDay &&
+                    calMonth === selectedMonth &&
+                    calYear === selectedYear;
                   return (
                     <TouchableOpacity
                       key={di}
-                      style={[styles.calCell, isSelected && styles.calCellSelected, isToday && !isSelected && styles.calCellToday]}
-                      onPress={() => !isPast && day !== null && handleDaySelect(day)}
+                      style={[
+                        styles.calCell,
+                        isSelected && styles.calCellSelected,
+                        isToday && !isSelected && styles.calCellToday,
+                      ]}
+                      onPress={() =>
+                        !isPast && day !== null && handleDaySelect(day)
+                      }
                       disabled={!day || isPast}
                     >
-                      <Text style={[
-                        styles.calDayText,
-                        isSelected && styles.calDaySelected,
-                        isToday && !isSelected && styles.calDayToday,
-                        isPast && styles.calDayPast,
-                      ]}>
+                      <Text
+                        style={[
+                          styles.calDayText,
+                          isSelected && styles.calDaySelected,
+                          isToday && !isSelected && styles.calDayToday,
+                          isPast && styles.calDayPast,
+                        ]}
+                      >
                         {day ?? ''}
                       </Text>
                     </TouchableOpacity>
@@ -267,7 +323,7 @@ export default function TreffitScreen({ onBack }: Props) {
                 })}
               </View>
             ))}
-          </View>
+          </BasicView>
         )}
       </View>
 
@@ -276,14 +332,26 @@ export default function TreffitScreen({ onBack }: Props) {
         <Text style={styles.sectionTitle}>Mikä kellon aika?</Text>
 
         <Text style={styles.timeLabel}>Tunti</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.chipRow}
+        >
           {Array.from({ length: 24 }, (_, i) => i).map(h => (
             <TouchableOpacity
               key={h}
-              style={[styles.timeChip, selectedHour === h && styles.timeChipActive]}
+              style={[
+                styles.timeChip,
+                selectedHour === h && styles.timeChipActive,
+              ]}
               onPress={() => setSelectedHour(h)}
             >
-              <Text style={[styles.timeChipText, selectedHour === h && styles.timeChipTextActive]}>
+              <Text
+                style={[
+                  styles.timeChipText,
+                  selectedHour === h && styles.timeChipTextActive,
+                ]}
+              >
                 {h.toString().padStart(2, '0')}
               </Text>
             </TouchableOpacity>
@@ -295,10 +363,18 @@ export default function TreffitScreen({ onBack }: Props) {
           {([0, 15, 30, 45] as const).map(m => (
             <TouchableOpacity
               key={m}
-              style={[styles.minuteChip, selectedMinute === m && styles.timeChipActive]}
+              style={[
+                styles.minuteChip,
+                selectedMinute === m && styles.timeChipActive,
+              ]}
               onPress={() => setSelectedMinute(m)}
             >
-              <Text style={[styles.timeChipText, selectedMinute === m && styles.timeChipTextActive]}>
+              <Text
+                style={[
+                  styles.timeChipText,
+                  selectedMinute === m && styles.timeChipTextActive,
+                ]}
+              >
                 :{m.toString().padStart(2, '0')}
               </Text>
             </TouchableOpacity>
@@ -315,11 +391,18 @@ export default function TreffitScreen({ onBack }: Props) {
       </View>
 
       <TouchableOpacity
-        style={[styles.nextBtn, !canProceed && styles.nextBtnDisabled]}
+        style={[lightShadow, styles.nextBtn]}
         onPress={() => canProceed && setStep('activity')}
         disabled={!canProceed}
       >
-        <Text style={styles.nextBtnText}>Seuraava →</Text>
+        <Text
+          style={[
+            styles.nextBtnText,
+            !canProceed && styles.nextBtnTextDisabled,
+          ]}
+        >
+          Seuraava →
+        </Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -345,10 +428,34 @@ export default function TreffitScreen({ onBack }: Props) {
 
       <View style={styles.activityGrid}>
         {[
-          { type: 'food' as ActivityType, emoji: '🍽️', label: 'Syödä', color: '#FF8C69', bg: '#FFE8D6' },
-          { type: 'leffa' as ActivityType, emoji: '🎬', label: 'Leffa', color: '#7B61FF', bg: '#EDE8FF' },
-          { type: 'sport' as ActivityType, emoji: '💪', label: 'Urheilla', color: '#4BAF9E', bg: '#D4F0EA' },
-          { type: 'kohde' as ActivityType, emoji: '📍', label: 'Kohde', color: '#E8820C', bg: '#FFF0DE' },
+          {
+            type: 'food' as ActivityType,
+            emoji: '🍽️',
+            label: 'Syödä',
+            color: '#FF8C69',
+            bg: '#FFE8D6',
+          },
+          {
+            type: 'leffa' as ActivityType,
+            emoji: '🎬',
+            label: 'Leffa',
+            color: '#7B61FF',
+            bg: '#EDE8FF',
+          },
+          {
+            type: 'sport' as ActivityType,
+            emoji: '💪',
+            label: 'Urheilla',
+            color: '#4BAF9E',
+            bg: '#D4F0EA',
+          },
+          {
+            type: 'kohde' as ActivityType,
+            emoji: '📍',
+            label: 'Kohde',
+            color: 'rgba(0,0,0,0.36)',
+            bg: '#FFF0DE',
+          },
         ].map(opt => (
           <TouchableOpacity
             key={opt.type}
@@ -357,7 +464,9 @@ export default function TreffitScreen({ onBack }: Props) {
             activeOpacity={0.8}
           >
             <Text style={styles.activityEmoji}>{opt.emoji}</Text>
-            <Text style={[styles.activityLabel, { color: opt.color }]}>{opt.label}</Text>
+            <Text style={[styles.activityLabel, { color: opt.color }]}>
+              {opt.label}
+            </Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -375,11 +484,14 @@ export default function TreffitScreen({ onBack }: Props) {
     };
 
     const renderGrid = (items: { emoji: string; label: string }[]) => (
-      <ScrollView contentContainerStyle={styles.choiceGrid} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.choiceGrid}
+        showsVerticalScrollIndicator={false}
+      >
         {items.map((item, i) => (
           <TouchableOpacity
             key={i}
-            style={styles.choiceCard}
+            style={[lightShadow, styles.choiceCard]}
             onPress={() => setSelectedItem(item)}
             activeOpacity={0.8}
           >
@@ -394,19 +506,26 @@ export default function TreffitScreen({ onBack }: Props) {
       if (items.length === 0) {
         return (
           <View style={styles.empty}>
-            <Text style={styles.emptyEmoji}>{activityType === 'leffa' ? '🎬' : '📍'}</Text>
+            <Text style={styles.emptyEmoji}>
+              {activityType === 'leffa' ? '🎬' : '📍'}
+            </Text>
             <Text style={styles.emptyText}>Lista on tyhjä!</Text>
             <Text style={styles.emptyHint}>{emptyMsg}</Text>
           </View>
         );
       }
       return (
-        <ScrollView contentContainerStyle={styles.listContent} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+        >
           {items.map(item => (
             <TouchableOpacity
               key={item.id}
-              style={styles.listCard}
-              onPress={() => setSelectedItem({ label: item.name, emoji: item.emoji })}
+              style={[lightShadow, styles.listCard]}
+              onPress={() =>
+                setSelectedItem({ label: item.name, emoji: item.emoji })
+              }
               activeOpacity={0.8}
             >
               <Text style={styles.listEmoji}>{item.emoji}</Text>
@@ -424,18 +543,29 @@ export default function TreffitScreen({ onBack }: Props) {
           <TouchableOpacity onPress={handleBack} style={styles.backBtn}>
             <Text style={styles.backText}>← Takaisin</Text>
           </TouchableOpacity>
-          <Text style={styles.title}>{activityType ? titleMap[activityType] : ''}</Text>
+          <Text style={styles.title}>
+            {activityType ? titleMap[activityType] : ''}
+          </Text>
           <View style={styles.summaryPill}>
             <Text style={styles.summaryPillText}>
-              📅 {selectedDateStr} klo {formatTime(selectedHour, selectedMinute)}
+              📅 {selectedDateStr} klo{' '}
+              {formatTime(selectedHour, selectedMinute)}
             </Text>
           </View>
         </View>
 
         {activityType === 'food' && renderGrid(FOODS)}
         {activityType === 'sport' && renderGrid(SPORTS)}
-        {activityType === 'leffa' && renderFirebaseList(leffaItems, 'Lisää leffoja kotisivun Leffalista-osiosta')}
-        {activityType === 'kohde' && renderFirebaseList(kohdeItems, 'Lisää kohteita kotisivun Kohdelista-osiosta')}
+        {activityType === 'leffa' &&
+          renderFirebaseList(
+            leffaItems,
+            'Lisää leffoja kotisivun Leffalista-osiosta',
+          )}
+        {activityType === 'kohde' &&
+          renderFirebaseList(
+            kohdeItems,
+            'Lisää kohteita kotisivun Kohdelista-osiosta',
+          )}
       </View>
     );
   };
@@ -455,17 +585,24 @@ export default function TreffitScreen({ onBack }: Props) {
           activeOpacity={1}
           onPress={() => !sent && !sending && setSelectedItem(null)}
         >
-          <TouchableOpacity activeOpacity={1} style={styles.confirmCard}>
+          <TouchableOpacity
+            activeOpacity={1}
+            style={[lightShadow, styles.confirmCard]}
+          >
             {sent ? (
               <>
                 <Text style={styles.confirmEmoji}>🎉</Text>
                 <Text style={styles.confirmTitle}>Lähetetty!</Text>
-                <Text style={styles.confirmDesc}>{partnerName} saa ilmoituksen.</Text>
+                <Text style={styles.confirmDesc}>
+                  {partnerName} saa ilmoituksen.
+                </Text>
               </>
             ) : (
               <>
                 <Text style={styles.confirmEmoji}>{selectedItem.emoji}</Text>
-                <Text style={styles.confirmItemLabel}>{selectedItem.label}</Text>
+                <Text style={styles.confirmItemLabel}>
+                  {selectedItem.label}
+                </Text>
                 <View style={styles.confirmBadge}>
                   <Text style={styles.confirmBadgeText}>Mahtava idea! 🎉</Text>
                 </View>
@@ -482,12 +619,18 @@ export default function TreffitScreen({ onBack }: Props) {
                   onPress={handleSend}
                   disabled={sending}
                 >
-                  {sending
-                    ? <ActivityIndicator color="#fff" />
-                    : <Text style={styles.sendBtnText}>Lähetä {partnerName}lle 💌</Text>
-                  }
+                  {sending ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Text style={styles.sendBtnText}>
+                      Lähetä {partnerName}lle 💌
+                    </Text>
+                  )}
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => setSelectedItem(null)} style={styles.closeLink}>
+                <TouchableOpacity
+                  onPress={() => setSelectedItem(null)}
+                  style={styles.closeLink}
+                >
                   <Text style={styles.closeLinkText}>Sulje</Text>
                 </TouchableOpacity>
               </>
@@ -515,9 +658,22 @@ const styles = StyleSheet.create({
 
   header: { paddingHorizontal: 24, paddingTop: 16, paddingBottom: 8 },
   backBtn: { marginBottom: 10 },
-  backText: { color: '#FF6B9D', fontSize: 16, fontWeight: '600' },
-  title: { fontSize: 26, fontWeight: '800', color: '#222', marginBottom: 2 },
-  stepLabel: { fontSize: 13, color: '#AAA', marginBottom: 8 },
+  backText: {
+    color: 'rgba(0,0,0,0.36)',
+    fontSize: 16,
+    fontFamily: fontFamily.bold,
+  },
+  title: {
+    fontSize: 26,
+    fontFamily: fontFamily.bold,
+    marginBottom: 2,
+  },
+  stepLabel: {
+    color: 'rgba(0,0,0,0.36)',
+    fontSize: 13,
+    marginBottom: 8,
+    fontFamily: fontFamily.semiBold,
+  },
 
   summaryPill: {
     alignSelf: 'flex-start',
@@ -527,57 +683,90 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     marginTop: 4,
   },
-  summaryPillText: { color: '#FF6B9D', fontSize: 13, fontWeight: '700' },
+  summaryPillText: {
+    color: 'rgba(0,0,0,0.36)',
+    fontSize: 13,
+    fontFamily: fontFamily.bold,
+  },
 
   // Sections
   section: { marginHorizontal: 20, marginTop: 16 },
-  sectionTitle: { fontSize: 17, fontWeight: '700', color: '#333', marginBottom: 10 },
+  sectionTitle: {
+    fontSize: 17,
+    fontFamily: fontFamily.bold,
+    color: 'black',
+    marginBottom: 10,
+  },
 
   // Date button
   dateBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255,255,255,0.5)',
     borderRadius: 16,
     padding: 16,
-    borderWidth: 2,
-    borderColor: '#F0F0F0',
+    borderWidth: 1,
+    borderColor: 'white',
+    overflow: 'hidden',
     gap: 10,
   },
-  dateBtnActive: { borderColor: '#FF6B9D' },
+  dateBtnActive: { bordercolor: 'rgba(0,0,0,0.36' },
   dateBtnEmoji: { fontSize: 20 },
-  dateBtnText: { flex: 1, fontSize: 16, fontWeight: '600', color: '#222' },
-  dateBtnPlaceholder: { color: '#CCC' },
-  dateBtnArrow: { fontSize: 12, color: '#CCC' },
+  dateBtnText: {
+    flex: 1,
+    fontSize: 16,
+    fontFamily: fontFamily.bold,
+    color: '#222',
+  },
+  dateBtnPlaceholder: { color: 'rgba(0,0,0,0.36)' },
+  dateBtnArrow: { fontSize: 12, color: 'rgba(0,0,0,0.36)' },
 
   // Calendar
   calendar: {
-    backgroundColor: '#fff',
-    borderRadius: 20,
     padding: 12,
     marginTop: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
   },
-  calHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 },
+  calHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
   calNavBtn: { padding: 8 },
-  calNavText: { fontSize: 22, color: '#FF6B9D', fontWeight: '700' },
-  calMonthText: { fontSize: 15, fontWeight: '700', color: '#333' },
+  calNavText: {
+    fontSize: 22,
+    color: 'rgba(0,0,0,0.36)',
+    fontFamily: fontFamily.bold,
+  },
+  calMonthText: { fontSize: 15, fontFamily: fontFamily.bold, color: '#333' },
   calRow: { flexDirection: 'row' },
-  calCell: { flex: 1, paddingVertical: 7, justifyContent: 'center', alignItems: 'center', borderRadius: 10 },
-  calCellSelected: { backgroundColor: '#FF6B9D' },
+  calCell: {
+    flex: 1,
+    paddingVertical: 7,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+  },
+  calCellSelected: { backgroundcolor: 'rgba(0,0,0,0.36)' },
   calCellToday: { backgroundColor: '#FFE4EE' },
-  calHeaderText: { fontSize: 11, fontWeight: '700', color: '#CCC' },
-  calDayText: { fontSize: 14, fontWeight: '500', color: '#333' },
-  calDaySelected: { color: '#fff', fontWeight: '800' },
-  calDayToday: { color: '#FF6B9D', fontWeight: '800' },
+  calHeaderText: {
+    fontSize: 11,
+    fontFamily: fontFamily.bold,
+    color: 'rgba(0,0,0,0.36)',
+  },
+  calDayText: { fontSize: 14, fontFamily: fontFamily.bold, color: '#333' },
+  calDaySelected: { color: '#fff', fontFamily: fontFamily.bold },
+  calDayToday: { color: 'rgba(0,0,0,0.36)', fontFamily: fontFamily.bold },
   calDayPast: { color: '#DDD' },
 
   // Time
-  timeLabel: { fontSize: 13, fontWeight: '700', color: '#888', marginTop: 12, marginBottom: 6 },
+  timeLabel: {
+    fontSize: 13,
+    fontFamily: fontFamily.bold,
+    color: '#888',
+    marginTop: 12,
+    marginBottom: 6,
+  },
   chipRow: { gap: 6, alignItems: 'center' },
   timeChip: {
     paddingHorizontal: 14,
@@ -587,9 +776,13 @@ const styles = StyleSheet.create({
     minWidth: 44,
     alignItems: 'center',
   },
-  timeChipActive: { backgroundColor: '#FF6B9D' },
-  timeChipText: { fontSize: 14, fontWeight: '600', color: '#666' },
-  timeChipTextActive: { color: '#fff' },
+  timeChipActive: { backgroundcolor: 'rgba(0,0,0,0.36)' },
+  timeChipText: {
+    fontSize: 14,
+    fontFamily: fontFamily.bold,
+    color: 'rgba(0,0,0,0.36)',
+  },
+  timeChipTextActive: { color: '#000' },
   minuteRow: { flexDirection: 'row', gap: 10, marginTop: 2 },
   minuteChip: {
     flex: 1,
@@ -605,24 +798,31 @@ const styles = StyleSheet.create({
     padding: 14,
     alignItems: 'center',
   },
-  timeSummaryText: { color: '#FF6B9D', fontSize: 15, fontWeight: '700' },
+  timeSummaryText: {
+    color: 'rgba(0,0,0,0.50)',
+    fontSize: 17,
+    fontFamily: fontFamily.bold,
+  },
 
   // Next button
   nextBtn: {
     marginHorizontal: 20,
     marginTop: 24,
-    backgroundColor: '#FF6B9D',
+    backgroundColor: 'rgba(255,255,255,0.5)',
     borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'white',
+    overflow: 'hidden',
     padding: 18,
     alignItems: 'center',
   },
-  nextBtnDisabled: { backgroundColor: '#F0F0F0' },
-  nextBtnText: { color: '#fff', fontSize: 17, fontWeight: '800' },
+  nextBtnText: { color: '#000', fontSize: 17, fontFamily: fontFamily.bold },
+  nextBtnTextDisabled: { color: 'rgba(0,0,0,0.36)' },
 
   // Activity step
   bigQuestion: {
     fontSize: 20,
-    fontWeight: '800',
+    fontFamily: fontFamily.bold,
     color: '#333',
     paddingHorizontal: 24,
     marginTop: 8,
@@ -631,11 +831,11 @@ const styles = StyleSheet.create({
   activityGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingHorizontal: 16,
-    gap: 12,
+    gap: 10,
+    left: 20,
   },
   activityCard: {
-    width: '46%',
+    width: 176,
     borderRadius: 24,
     padding: 24,
     alignItems: 'center',
@@ -648,7 +848,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   activityEmoji: { fontSize: 44 },
-  activityLabel: { fontSize: 18, fontWeight: '800' },
+  activityLabel: { fontSize: 18, fontFamily: fontFamily.bold },
 
   // Choice step - grid (food/sport)
   choiceGrid: {
@@ -660,44 +860,55 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   choiceCard: {
-    width: '45%',
-    backgroundColor: '#fff',
+    width: 176,
+    backgroundColor: 'rgba(255,255,255,0.5)',
     borderRadius: 20,
     padding: 20,
     alignItems: 'center',
-    gap: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.07,
-    shadowRadius: 4,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: 'white',
+    overflow: 'hidden',
   },
   choiceEmoji: { fontSize: 48 },
-  choiceLabel: { fontSize: 15, fontWeight: '700', color: '#333' },
+  choiceLabel: { fontSize: 15, fontFamily: fontFamily.bold, color: '#333' },
 
   // Choice step - list (leffa/kohde)
-  listContent: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 32, gap: 10 },
+  listContent: {
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    paddingBottom: 32,
+    gap: 10,
+  },
   listCard: {
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255,255,255,0.5)',
     borderRadius: 18,
     padding: 18,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.07,
-    shadowRadius: 4,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: 'white',
+    overflow: 'hidden',
   },
   listEmoji: { fontSize: 32, marginRight: 14 },
-  listLabel: { flex: 1, fontSize: 16, fontWeight: '600', color: '#222' },
+  listLabel: {
+    flex: 1,
+    fontSize: 16,
+    fontFamily: fontFamily.bold,
+    color: '#222',
+  },
   listArrow: { fontSize: 22, color: '#DDD' },
 
   // Empty state
-  empty: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 8, padding: 40 },
+  empty: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+    padding: 40,
+  },
   emptyEmoji: { fontSize: 56 },
-  emptyText: { fontSize: 18, fontWeight: '700', color: '#333' },
-  emptyHint: { fontSize: 14, color: '#AAA', textAlign: 'center' },
+  emptyText: { fontSize: 18, fontFamily: fontFamily.bold, color: '#333' },
+  emptyHint: { fontSize: 14, color: 'rgba(0,0,0,0.36)', textAlign: 'center' },
 
   // Confirmation modal
   overlay: {
@@ -708,15 +919,22 @@ const styles = StyleSheet.create({
     padding: 28,
   },
   confirmCard: {
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255,255,255,0.5)',
     borderRadius: 28,
+    borderWidth: 1,
+    borderColor: 'white',
+    overflow: 'hidden',
     padding: 32,
     width: '100%',
     alignItems: 'center',
     gap: 10,
   },
   confirmEmoji: { fontSize: 72, marginBottom: 4 },
-  confirmItemLabel: { fontSize: 22, fontWeight: '800', color: '#222' },
+  confirmItemLabel: {
+    fontSize: 22,
+    fontFamily: fontFamily.bold,
+    color: '#222',
+  },
   confirmBadge: {
     backgroundColor: '#FFE4EE',
     borderRadius: 20,
@@ -724,12 +942,26 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     marginTop: 4,
   },
-  confirmBadgeText: { color: '#FF6B9D', fontSize: 16, fontWeight: '800' },
-  confirmReadyText: { fontSize: 20, fontWeight: '800', color: '#222', marginTop: 8 },
-  confirmNote: { fontSize: 13, color: '#AAA' },
-  confirmJasper: { fontSize: 16, color: '#FF6B9D', fontWeight: '700', marginTop: 4 },
+  confirmBadgeText: {
+    color: 'rgba(0,0,0,0.36)',
+    fontSize: 16,
+    fontFamily: fontFamily.bold,
+  },
+  confirmReadyText: {
+    fontSize: 20,
+    fontFamily: fontFamily.bold,
+    color: '#222',
+    marginTop: 8,
+  },
+  confirmNote: { fontSize: 13, color: 'rgba(0,0,0,0.36)' },
+  confirmJasper: {
+    fontSize: 16,
+    color: 'rgba(0,0,0,0.36)',
+    fontFamily: fontFamily.bold,
+    marginTop: 4,
+  },
   sendBtn: {
-    backgroundColor: '#FF6B9D',
+    backgroundColor: 'rgba(255,100,100,1)',
     borderRadius: 16,
     paddingHorizontal: 28,
     paddingVertical: 14,
@@ -737,9 +969,9 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
   },
-  sendBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
+  sendBtnText: { color: '#fff', fontSize: 15, fontFamily: fontFamily.bold },
   closeLink: { marginTop: 6 },
-  closeLinkText: { color: '#CCC', fontSize: 14 },
-  confirmTitle: { fontSize: 24, fontWeight: '800', color: '#222' },
+  closeLinkText: { color: 'rgba(0,0,0,0.36)', fontSize: 14 },
+  confirmTitle: { fontSize: 24, fontFamily: fontFamily.bold, color: '#222' },
   confirmDesc: { fontSize: 15, color: '#888' },
 });
