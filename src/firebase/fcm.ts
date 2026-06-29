@@ -3,6 +3,8 @@ import {
   getToken,
   onMessage,
   onTokenRefresh,
+  onNotificationOpenedApp,
+  getInitialNotification,
   requestPermission,
   setBackgroundMessageHandler,
   AuthorizationStatus,
@@ -39,6 +41,20 @@ export function onForegroundMessage(
 // Must be called outside of any component (at app root level)
 export function registerBackgroundHandler(): void {
   setBackgroundMessageHandler(getMessaging(), async () => {});
+}
+
+export function onNotificationTap(
+  handler: (screen: string) => void,
+): () => void {
+  return onNotificationOpenedApp(getMessaging(), msg => {
+    const screen = msg.data?.screen;
+    if (screen) handler(screen);
+  });
+}
+
+export async function getInitialNotificationScreen(): Promise<string | null> {
+  const msg = await getInitialNotification(getMessaging());
+  return msg?.data?.screen ?? null;
 }
 
 export function getPartnerName(userId: UserId): string {

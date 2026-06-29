@@ -1,6 +1,8 @@
+import { BlurView } from '@react-native-community/blur';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  Image,
   Modal,
   ScrollView,
   StyleSheet,
@@ -165,6 +167,7 @@ export default function TreffitScreen({ onBack }: Props) {
       const myName = userId === 'jasper' ? 'Jasper' : 'Senja';
       const dateStr = formatDateShort(selectedYear, selectedMonth, selectedDay);
       const timeStr = formatTime(selectedHour, selectedMinute);
+      const treffitTimestamp = new Date(selectedYear, selectedMonth, selectedDay, selectedHour, selectedMinute).getTime();
       await sendNotification({
         to: partnerId,
         message: `${myName} suunnittelee treffit! ${selectedItem.emoji} ${selectedItem.label} – ${dateStr} klo ${timeStr} 💕`,
@@ -172,6 +175,7 @@ export default function TreffitScreen({ onBack }: Props) {
         from: userId,
         createdAt: Date.now(),
         read: {},
+        treffitTimestamp,
       });
       setSent(true);
       setTimeout(() => {
@@ -214,7 +218,14 @@ export default function TreffitScreen({ onBack }: Props) {
         <TouchableOpacity onPress={handleBack} style={styles.backBtn}>
           <Text style={styles.backText}>← Takaisin</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>💑 Treffit</Text>
+        <View style={styles.titleRow}>
+          <Image
+            source={require('../Images/Treffi.webp')}
+            style={{ width: 32, height: 32, borderRadius: 8 }}
+            resizeMode="contain"
+          />
+          <Text style={styles.title}>Treffit</Text>
+        </View>
         <Text style={styles.stepLabel}>Vaihe 1/2 – Milloin?</Text>
       </View>
 
@@ -415,7 +426,14 @@ export default function TreffitScreen({ onBack }: Props) {
         <TouchableOpacity onPress={handleBack} style={styles.backBtn}>
           <Text style={styles.backText}>← Takaisin</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>💑 Treffit</Text>
+        <View style={styles.titleRow}>
+          <Image
+            source={require('../Images/Treffi.webp')}
+            style={{ width: 32, height: 32, borderRadius: 8 }}
+            resizeMode="contain"
+          />
+          <Text style={styles.title}>Treffit</Text>
+        </View>
         <Text style={styles.stepLabel}>Vaihe 2/2 – Mitä tehdään?</Text>
         <View style={styles.summaryPill}>
           <Text style={styles.summaryPillText}>
@@ -580,11 +598,17 @@ export default function TreffitScreen({ onBack }: Props) {
 
     return (
       <Modal transparent animationType="fade">
-        <TouchableOpacity
-          style={styles.overlay}
-          activeOpacity={1}
-          onPress={() => !sent && !sending && setSelectedItem(null)}
-        >
+        <BlurView
+          style={StyleSheet.absoluteFill}
+          blurType="light"
+          blurAmount={20}
+        />
+        <View style={styles.overlay}>
+          <TouchableOpacity
+            style={StyleSheet.absoluteFill}
+            activeOpacity={1}
+            onPress={() => !sent && !sending && setSelectedItem(null)}
+          />
           <TouchableOpacity
             activeOpacity={1}
             style={[lightShadow, styles.confirmCard]}
@@ -636,7 +660,7 @@ export default function TreffitScreen({ onBack }: Props) {
               </>
             )}
           </TouchableOpacity>
-        </TouchableOpacity>
+        </View>
       </Modal>
     );
   };
@@ -913,13 +937,13 @@ const styles = StyleSheet.create({
   // Confirmation modal
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.55)',
+    backgroundColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 28,
   },
   confirmCard: {
-    backgroundColor: 'rgba(255,255,255,0.5)',
+    backgroundColor: 'rgba(255,255,255,0.2)',
     borderRadius: 28,
     borderWidth: 1,
     borderColor: 'white',
@@ -974,4 +998,6 @@ const styles = StyleSheet.create({
   closeLinkText: { color: 'rgba(0,0,0,0.36)', fontSize: 14 },
   confirmTitle: { fontSize: 24, fontFamily: fontFamily.bold, color: '#222' },
   confirmDesc: { fontSize: 15, color: '#888' },
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  titleIcon: { width: 32, height: 32 },
 });

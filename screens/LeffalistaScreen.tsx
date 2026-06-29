@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  Image,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -12,7 +13,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import BasicView, { lightShadow } from '../Components/BasicView';
+import BasicView, { fontFamily, lightShadow } from '../Components/BasicView';
 import { useUser } from '../src/context/UserContext';
 import {
   addLeffaItem,
@@ -91,7 +92,14 @@ export default function LeffalistaScreen({ onBack }: Props) {
           <Text style={styles.backText}>← Takaisin</Text>
         </TouchableOpacity>
         <View style={styles.headerRow}>
-          <Text style={styles.title}>🎬 Leffalista</Text>
+          <View style={styles.titleRow}>
+            <Image
+              source={require('../Images/Elokuva.webp')}
+              style={{ width: 32, height: 32, borderRadius: 8 }}
+              resizeMode="contain"
+            />
+            <Text style={styles.title}>Leffalista</Text>
+          </View>
           <TouchableOpacity
             style={styles.addBtn}
             onPress={() => setShowAdd(true)}
@@ -107,7 +115,7 @@ export default function LeffalistaScreen({ onBack }: Props) {
           <Text style={styles.emptyEmoji}>🎬</Text>
           <Text style={styles.emptyText}>Lista on tyhjä!</Text>
           <Text style={styles.emptyHint}>
-            Lisää leffoja + Lisää painikkeesta
+            Lisää leffoja "+ Lisää" painikkeesta
           </Text>
         </View>
       ) : (
@@ -211,17 +219,33 @@ const styles = StyleSheet.create({
   },
   title: { fontSize: 28, fontWeight: '800', color: '#222' },
   addBtn: {
-    backgroundColor: '#7B61FF',
+    backgroundColor: 'rgba(255,255,255,0.5)',
+    borderWidth: 1,
+    borderColor: 'white',
     borderRadius: 14,
     paddingHorizontal: 18,
     paddingVertical: 9,
   },
-  addBtnText: { color: '#fff', fontWeight: '700', fontSize: 14 },
-  subtitle: { color: 'rgba(0,0,0,0.36)', fontSize: 13, marginTop: 4 },
+  addBtnText: { color: '#000', fontWeight: '700', fontSize: 14 },
+  subtitle: {
+    color: 'rgba(0,0,0,0.36)',
+    fontFamily: fontFamily.semiBold,
+    fontSize: 13,
+    marginTop: 4,
+  },
   empty: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 8 },
   emptyEmoji: { fontSize: 56 },
-  emptyText: { fontSize: 18, fontWeight: '700', color: '#333' },
-  emptyHint: { fontSize: 14, color: 'rgba(0,0,0,0.36)' },
+  emptyText: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: 'rgba(0,0,0,0.36)',
+    fontFamily: fontFamily.semiBold,
+  },
+  emptyHint: {
+    fontSize: 14,
+    color: 'rgba(0,0,0,0.36)',
+    fontFamily: fontFamily.semiBold,
+  },
   list: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 32, gap: 10 },
   itemCard: {
     padding: 16,
@@ -234,7 +258,6 @@ const styles = StyleSheet.create({
   removeText: { fontSize: 15, color: '#DDD', fontWeight: '700' },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.45)',
     justifyContent: 'flex-end',
   },
   sheet: {
@@ -290,4 +313,9 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   saveBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  titleRow: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    gap: 10,
+  },
 });

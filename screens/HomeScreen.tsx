@@ -8,8 +8,9 @@ import {
   View,
 } from 'react-native';
 import { Screen } from '../App';
-import { fontFamily } from '../Components/BasicView';
+import BasicView, { fontFamily } from '../Components/BasicView';
 import { useStyles } from '../Components/Styles';
+import TopBlurFade, { BottomBlurFade } from '../Components/TopBlurFade';
 import { useUser } from '../src/context/UserContext';
 import { watchNotifications } from '../src/firebase/db';
 import { AppNotification } from '../src/types';
@@ -87,35 +88,8 @@ export default function HomeScreen({ onNavigate }: Props) {
 
   return (
     <View>
-      <View style={styles.header}>
-        <View style={styles.headerRow}>
-          <View style={{ marginTop: 50 }}>
-            <Text style={styles.greeting}>Hei {displayName}! 💕</Text>
-            <Text style={[styles.subtitle, { color: styles1.Black36.color }]}>
-              Mitä tehdään tänään?
-            </Text>
-          </View>
-          <View style={styles.headerActions}>
-            <TouchableOpacity
-              style={styles.notifBtn}
-              onPress={() => onNavigate('notifications')}
-            >
-              <Text style={styles.notifIcon}>🔔</Text>
-              {unreadCount > 0 && (
-                <View style={styles.badge}>
-                  <Text style={styles.badgeText}>
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </Text>
-                </View>
-              )}
-            </TouchableOpacity>
-            <TouchableOpacity onPress={logout} style={styles.logoutBtn}>
-              <Text style={styles.logoutText}>Vaihda</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-
+      <TopBlurFade HEIGHT={200} />
+      <BottomBlurFade />
       <ScrollView
         contentContainerStyle={styles.grid}
         showsVerticalScrollIndicator={false}
@@ -143,14 +117,78 @@ export default function HomeScreen({ onNavigate }: Props) {
             <Text style={[styles.arrow, { color: cat.color }]}>›</Text>
           </TouchableOpacity>
         ))}
+        <TouchableOpacity
+          onPress={logout}
+          style={styles.vaihda}
+          activeOpacity={0.75}
+        >
+          <Text style={styles.vaihdaText}>Vaihda käyttäjää</Text>
+        </TouchableOpacity>
       </ScrollView>
+      <View style={styles.header}>
+        <View style={styles.headerRow}>
+          <View style={{ marginTop: 50 }}>
+            <Text style={styles.greeting}>Hei {displayName}! 💕</Text>
+            <Text style={[styles.subtitle, { color: styles1.Black36.color }]}>
+              Mitä tehdään tänään?
+            </Text>
+          </View>
+          <View style={styles.headerActions}>
+            <TouchableOpacity
+              style={styles.notifBtn}
+              onPress={() => onNavigate('notifications')}
+            >
+              <BasicView
+                style={{
+                  width: 50,
+                  height: 50,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderRadius: 15,
+                }}
+              >
+                <Text style={styles.notifIcon}>🔔</Text>
+                {unreadCount > 0 && (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </Text>
+                  </View>
+                )}
+              </BasicView>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.notifBtn}
+              onPress={() => onNavigate('lahjapaketti')}
+            >
+              <BasicView
+                style={{
+                  width: 50,
+                  height: 50,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderRadius: 15,
+                }}
+              >
+                <Text style={styles.notifIcon}>🎁</Text>
+              </BasicView>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent' },
-  header: { paddingHorizontal: 24, paddingTop: 28, paddingBottom: 20 },
+  header: {
+    paddingHorizontal: 24,
+    paddingTop: 28,
+    paddingBottom: 20,
+    position: 'absolute',
+    zIndex: 20,
+  },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -166,8 +204,8 @@ const styles = StyleSheet.create({
   headerActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
     marginTop: 50,
+    left: 40,
   },
   notifBtn: { position: 'relative', padding: 6 },
   notifIcon: { fontSize: 26 },
@@ -184,16 +222,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   badgeText: { color: '#fff', fontSize: 11, fontWeight: '800' },
-  logoutBtn: {
-    backgroundColor: '#F0F0F0',
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+  vaihda: {
+    backgroundColor: 'rgba(255,255,255,0.5)',
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'white',
+    paddingVertical: 18,
+    alignItems: 'center',
+    marginTop: 4,
   },
-  logoutText: { fontSize: 13, fontFamily: fontFamily.semiBold },
+  vaihdaText: {
+    fontSize: 17,
+    fontFamily: fontFamily.semiBold,
+    color: 'rgba(0,0,0,0.6)',
+  },
   grid: {
     paddingHorizontal: 20,
     paddingBottom: 102,
+    paddingTop: 162,
     gap: 15,
   },
   card: {

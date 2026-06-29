@@ -40,6 +40,7 @@ export interface AppNotification {
   from: UserId;
   createdAt: number;
   read: Partial<Record<UserId, boolean>>;
+  treffitTimestamp?: number;
 }
 
 export interface ListItem {

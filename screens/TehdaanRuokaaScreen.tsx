@@ -113,7 +113,14 @@ export default function TehdaanRuokaaScreen({ onBack }: Props) {
           <Text style={styles.backText}>← Takaisin</Text>
         </TouchableOpacity>
         <View style={styles.headerRow}>
-          <Text style={styles.title}>👨‍🍳 Reseptit</Text>
+          <View style={styles.titleRow}>
+            <Image
+              source={require('../Images/Kokki.webp')}
+              style={{ width: 32, height: 32, borderRadius: 8 }}
+              resizeMode="contain"
+            />
+            <Text style={styles.title}>Reseptit</Text>
+          </View>
           <TouchableOpacity
             style={styles.addBtn}
             onPress={() => setShowAdd(true)}
@@ -318,12 +325,14 @@ const styles = StyleSheet.create({
   title: { fontSize: 28, fontWeight: '800', color: '#222' },
   subtitle: { fontSize: 13, color: 'rgba(0,0,0,0.36)', marginTop: 4 },
   addBtn: {
-    backgroundColor: '#FF8C69',
+    backgroundColor: 'rgba(255,255,255,0.5)',
+    borderWidth: 1,
+    borderColor: 'white',
     borderRadius: 14,
     paddingHorizontal: 18,
     paddingVertical: 9,
   },
-  addBtnText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+  addBtnText: { color: '#000', fontWeight: '700', fontSize: 14 },
   list: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 32, gap: 12 },
   recipeCard: {
     backgroundColor: 'rgba(255,255,255,0.5)',
@@ -435,4 +444,9 @@ const styles = StyleSheet.create({
   },
   textArea: { height: 110, textAlignVertical: 'top' },
   textAreaLarge: { height: 150, textAlignVertical: 'top' },
+  titleRow: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    gap: 10,
+  },
 });

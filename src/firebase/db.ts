@@ -236,6 +236,10 @@ export async function markNotificationRead(
   await update(ref(db(), `/notifications/${id}/read/${userId}`), { [userId]: true });
 }
 
+export async function deleteAllNotifications(): Promise<void> {
+  await remove(ref(db(), '/notifications'));
+}
+
 // ─── FCM tokens ───────────────────────────────────────────────────────────────
 
 export async function saveFcmToken(userId: UserId, token: string): Promise<void> {
@@ -294,4 +298,32 @@ export async function addKohdeItem(item: Omit<ListItem, 'id'>): Promise<void> {
 
 export async function deleteKohdeItem(id: string): Promise<void> {
   await remove(ref(db(), `/shared/kohdelista/${id}`));
+}
+
+// ─── Kupongit ─────────────────────────────────────────────────────────────────
+
+export function watchCoupons(
+  onUpdate: (redeemed: Record<string, boolean>) => void,
+): () => void {
+  const r = ref(db(), '/shared/kupongit');
+  return onValue(r, snapshot => {
+    const val = snapshot.val() || {};
+    const result: Record<string, boolean> = {};
+    Object.entries(val).forEach(([id, data]) => {
+      result[id] = (data as any).redeemed === true;
+    });
+    onUpdate(result);
+  });
+}
+
+export async function redeemCoupon(couponId: string, userId: UserId): Promise<void> {
+  await update(ref(db(), `/shared/kupongit/${couponId}`), {
+    redeemed: true,
+    redeemedAt: Date.now(),
+    redeemedBy: userId,
+  });
+}
+
+export async function resetCoupons(): Promise<void> {
+  await remove(ref(db(), '/shared/kupongit'));
 }

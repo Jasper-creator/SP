@@ -15,6 +15,7 @@ import BasicView, { fontFamily, lightShadow } from './Components/BasicView';
 import HomeScreen from './screens/HomeScreen';
 import KauppalistaScreen from './screens/KauppalistaScreen';
 import KohdelistaScreen from './screens/KohdelistaScreen';
+import LahjapakettScreen from './screens/LahjapakettScreen';
 import LeffalistaScreen from './screens/LeffalistaScreen';
 import LoginScreen from './screens/LoginScreen';
 import NotificationsScreen from './screens/NotificationsScreen';
@@ -26,6 +27,8 @@ import { seedDefaultRecipes } from './src/firebase/db';
 import {
   initFCM,
   onForegroundMessage,
+  onNotificationTap,
+  getInitialNotificationScreen,
   registerBackgroundHandler,
 } from './src/firebase/fcm';
 
@@ -37,7 +40,8 @@ export type Screen =
   | 'tilaa'
   | 'notifications'
   | 'leffalista'
-  | 'kohdelista';
+  | 'kohdelista'
+  | 'lahjapaketti';
 
 // Register background handler at module level (required by Firebase)
 registerBackgroundHandler();
@@ -85,6 +89,16 @@ function AppContent() {
   };
 
   useEffect(() => {
+    const unsubscribe = onNotificationTap(screen => {
+      setScreen(screen as Screen);
+    });
+    getInitialNotificationScreen().then(screen => {
+      if (screen) setScreen(screen as Screen);
+    });
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
     if (!userId) return;
     initFCM(userId).catch(() => {});
     seedDefaultRecipes().catch(() => {});
@@ -129,6 +143,7 @@ function AppContent() {
       {screen === 'notifications' && <NotificationsScreen onBack={goBack} />}
       {screen === 'leffalista' && <LeffalistaScreen onBack={goBack} />}
       {screen === 'kohdelista' && <KohdelistaScreen onBack={goBack} />}
+      {screen === 'lahjapaketti' && <LahjapakettScreen onBack={goBack} />}
 
       {banner && (
         <Animated.View style={[styles.banner, { opacity: bannerOpacity }]}>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  Image,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -150,7 +151,14 @@ export default function KauppalistaScreen({ onBack }: Props) {
           <Text style={styles.backText}>← Takaisin</Text>
         </TouchableOpacity>
         <View style={styles.headerRow}>
-          <Text style={styles.title}>🛒 Kauppalista</Text>
+          <View style={styles.titleRow}>
+            <Image
+              source={require('../Images/Kauppa.webp')}
+              style={{ width: 32, height: 32, borderRadius: 8 }}
+              resizeMode="contain"
+            />
+            <Text style={styles.title}>Kauppalista</Text>
+          </View>
           <TouchableOpacity
             style={styles.addBtn}
             onPress={() => setShowAdd(true)}
@@ -176,7 +184,7 @@ export default function KauppalistaScreen({ onBack }: Props) {
           <Text style={styles.emptyEmoji}>🛒</Text>
           <Text style={styles.emptyText}>Lista on tyhjä!</Text>
           <Text style={styles.emptyHint}>
-            Lisää tuotteita + Lisää painikkeesta
+            Lisää tuotteita "+ Lisää" painikkeesta
           </Text>
         </View>
       ) : (
@@ -366,12 +374,14 @@ const styles = StyleSheet.create({
   },
   title: { fontSize: 28, fontWeight: '800', color: '#222' },
   addBtn: {
-    backgroundColor: '#5BB8D4',
+    backgroundColor: 'rgba(255,255,255,0.5)',
+    borderWidth: 1,
+    borderColor: 'white',
     borderRadius: 14,
     paddingHorizontal: 18,
     paddingVertical: 9,
   },
-  addBtnText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+  addBtnText: { color: '000', fontWeight: '700', fontSize: 14 },
   statsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -444,7 +454,6 @@ const styles = StyleSheet.create({
   removeText: { fontSize: 15, color: '#DDD', fontWeight: '700' },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.45)',
     justifyContent: 'flex-end',
   },
   sheet: {
@@ -501,4 +510,9 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   saveBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  titleRow: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    gap: 10,
+  },
 });

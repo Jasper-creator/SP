@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+  Image,
   Modal,
   ScrollView,
   StyleSheet,
@@ -522,7 +523,14 @@ export default function TilaaRuokaaScreen({ onBack }: Props) {
         >
           <Text style={styles.backText}>← Takaisin</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>🍜 Tilaa Ruokaa</Text>
+        <View style={styles.titleRow}>
+          <Image
+            source={require('../Images/Tilaus.webp')}
+            style={{ width: 32, height: 32, borderRadius: 8 }}
+            resizeMode="contain"
+          />
+          <Text style={styles.title}>Tilaa Ruokaa</Text>
+        </View>
         <Text style={styles.subtitle}>
           {selectedType
             ? `${selectedType.emoji} ${selectedType.label} – valitse ravintola`
@@ -775,4 +783,9 @@ const styles = StyleSheet.create({
   },
   orderNoteIcon: { fontSize: 20 },
   orderNoteText: { flex: 1, fontSize: 13, color: '#666', lineHeight: 20 },
+  titleRow: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    gap: 10,
+  },
 });
